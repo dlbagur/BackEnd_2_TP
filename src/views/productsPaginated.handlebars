@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos Paginados</title>
+    <link rel="stylesheet" href="/path/to/styles.css">
+</head>
+<body>
+    <h1>Productos Paginados</h1>
+    <ul id="product-list">
+        {{#each products}}
+            <li class="product-item card-io">
+                <span class="product-code">{{this.code}}</span>
+                <br>
+                <span class="product-category">{{this.category}}</span> - 
+                <span class="product-title">{{this.title}}</span>
+                <br>
+                <span class="product-description">{{this.description}}</span>
+                <br> 
+                Precio: $<span class="product-price">{{this.price}}</span> - 
+                Stock: <span class="product-stock">{{this.stock}}</span>
+                <div class="dropdown">
+                    <button class="dropdown-btn">Opciones</button>
+                    <div class="dropdown-menu">
+                        <a href="#" class="edit-btn" data-id="{{this._id}}">Modificar</a>
+                        <a href="#" class="delete-btn" data-id="{{this._id}}">Eliminar</a>
+                        <a href="#" class="add-cart-btn" data-id="{{this._id}}">Agregar al Carrito</a>
+                    </div>
+                </div>
+            </li>
+        {{/each}}
+    </ul>
+
+    <div class="pagination">
+        <!-- Botón Anterior -->
+        <button id="prevPage" 
+            {{#if hasPrevPage}} 
+                onclick="window.location='?page={{prevPage}}&limit={{limit}}&sort={{sort}}&category={{category}}&inStock={{inStock}}'"
+            {{else}} 
+                disabled
+            {{/if}}>
+            Anterior
+        </button>
+
+        <!-- Mostrar número de página -->
+        <span> Página {{page}} de {{totalPages}} </span>
+
+        <!-- Botón Siguiente -->
+        <button id="nextPage" 
+            {{#if hasNextPage}} 
+                onclick="window.location='?page={{nextPage}}&limit={{limit}}&sort={{sort}}&category={{category}}&inStock={{inStock}}'"
+            {{else}} 
+                disabled
+            {{/if}}>
+                Siguiente
+        </button>
+    </div>
+
+    <!-- Botón para agregar producto -->
+    <div class="container">
+        <button id="openAddProductModal" class="add-btn">Agregar Producto</button>
+    </div>
+
+    <!-- Modal para modificar un producto -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Modificar Producto</h2>
+            <form id="form-modificar-producto">
+                <input type="text" id="edit-product-code" placeholder="Nombre del vino" required>
+                <label for="Categoria">Seleccione categoría:</label>
+                <select id="edit-product-category">
+                    <option value="Tintos">Tintos</option>
+                    <option value="Blancos">Blancos</option>
+                    <option value="Rosados">Rosados</option>
+                    <option value="Espumantes">Espumantes</option>
+                </select>
+                <input type="text" id="edit-product-title" placeholder="Bodega productora" required>
+                <input type="text" id="edit-product-description" placeholder="Descripción" required>
+                <input type="number" id="edit-product-price" placeholder="Precio" required>
+                <input type="number" id="edit-product-stock" placeholder="Stock" required>
+                <br>
+                <button type="submit">Modificar Producto</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para agregar producto -->
+    <div id="addProductModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Agregar Nuevo Producto</h2>
+            <form id="form-agrego-producto">
+                <input type="text" id="product-code" placeholder="Nombre del vino" required>
+                <label for="Categoria">Seleccione categoría:</label>
+                <select id="product-category">
+                    <option value="Tintos" selected>Tintos</option>
+                    <option value="Blancos">Blancos</option>
+                    <option value="Rosados">Rosados</option>
+                    <option value="Espumantes">Espumantes</option>
+                </select>                
+                <input type="text" id="product-title" placeholder="Bodega productora" required>
+                <input type="text" id="product-description" placeholder="Descripción" required>
+                <input type="number" id="product-price" placeholder="Precio" required>
+                <input type="number" id="product-stock" placeholder="Stock" required>
+                <button type="submit">Agregar Producto</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/scripts/productsPaginated.js"></script>
+</body>
+</html>

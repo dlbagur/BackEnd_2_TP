@@ -1,0 +1,24 @@
+<h2> Registro Usuarios </h2>
+<hr>
+<form action="">
+    <div id="mensajes"></div>
+    <br>
+    <input type="text" id="nombre" placeholder="ingrese nombre">
+    <input type="text" id="apellido" placeholder="ingrese apellido">
+    <input type="email" id="email" placeholder="ingrese correo electrónico">
+    <input type="text" id="edad" placeholder="ingrese su edad">
+    <input type="password" id="password" placeholder="ingrese password">
+    <input type="text" id="cart" placeholder="carrito">
+    <label for="rol">Seleccione su rol:</label>
+    <select id="rol" name="rol">
+        <option value="user">user</option>
+        <option value="admin">admin</option>
+    </select>
+    
+    <br><br>
+    <input type="submit" id="btnSubmit" value="Registrar">
+</form>
+
+{{>menu}}
+
+<script src="/js/registro.js"></script>

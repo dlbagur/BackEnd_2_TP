@@ -1,0 +1,11 @@
+[
+    {
+        "first_name": "Diego",
+        "last_name": "Bagur",
+        "email": "dlbagur@hotmail.com",
+        "age": 66,
+        "password": "123",
+        "cart": 0,
+        "rol": "Admin"
+    }
+ ]

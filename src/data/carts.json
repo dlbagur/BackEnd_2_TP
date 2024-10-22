@@ -1,0 +1,15 @@
+[
+  { 
+       "usuario": "Diego",
+       "productos": [
+           {
+               "producto": "66dfa0edfdcce1b0bb143482",
+               "cantidad": 1
+           },
+           {
+               "producto": "66dfa0edfdcce1b0bb143483",
+               "cantidad": 1
+           }
+       ]
+   }   
+]
