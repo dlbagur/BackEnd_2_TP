@@ -20,19 +20,21 @@ btnSubmit.addEventListener("click", async(e)=>{
         alert("Complete los datos de ingreso")
         return 
     }
-
     let body={
-        email, password
+        email:email.toLowerCase(),
+        password
     }
 
     let respuesta=await fetch("/api/sessions/login", {
-        method:"post", 
+        method:"POST", 
         headers:{
             "Content-Type":"application/json"
         },
         body: JSON.stringify(body)
     })
+
     let datos=await respuesta.json()
+
     if(respuesta.status>=400){
         divMensajes.textContent=datos.error
         setTimeout(() => {

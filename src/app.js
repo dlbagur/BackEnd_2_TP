@@ -8,15 +8,20 @@ import productsManager from "./dao/ProductsManager.js"
 import cartsRouter from './routes/carts.router.js';
 import CartsManager from './dao/CartsManager.js';
 import { router as vistasRouter } from './routes/vistas.routers.js';
-import { router as sessionsRouter } from './routes/sessionsRouter.js'
+import { router as sessionsRouter } from './routes/sessions.router.js'
 import cookieParser from 'cookie-parser';
 import cookiesRouter from './routes/cookies.router.js';
 import sessions from 'express-session';
+import passport from "passport"
+import { initPassport } from './config/passport.config.js';
 import { auth } from './middleware/auth.js';
-import loginRouter from './routes/login.router.js';
+import FileStore from "session-file-store"
+import MongoStore from "connect-mongo"
 
 const PORT=config.PORT;
-const app = express();
+const app=express();
+
+const fileStore=FileStore(sessions)
 
 const serverHTTP = app.listen(PORT, () => {
     console.log(`Server en línea en http://localhost:${PORT}`);
@@ -39,10 +44,20 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('./src/public'));
 app.use(cookieParser());
 app.use(sessions({
-    secret:config.SECRET_SESSION,
-    resave:true,
-    saveUninitialized :true
+    secret: config.SECRET_SESSION,
+    resave: true,
+    saveUninitialized: true,
+    store: MongoStore.create(
+        {
+            mongoUrl: config.MONGO_URL,
+            dbName: config.DB_NAME,
+            ttl: 3600,
+        }
+    )
 }))
+initPassport()
+app.use(passport.initialize())
+app.use(passport.session())
 
 // Rutas
 app.use('/', vistasRouter);
@@ -50,7 +65,6 @@ app.use('/api/products', productsRouter);
 app.use('/api/carts', cartsRouter);
 app.use('/api/sessions', sessionsRouter);
 app.use('/cookies', cookiesRouter);
-app.use('/login', loginRouter);
 
 io.on('connection', (socket) => {
     console.log('Nuevo cliente conectado');

@@ -3,21 +3,6 @@ import { auth } from '../middleware/auth.js';
 
 const router = Router();
 
-let usuarios=[
-   {
-       nombre: 'Diego', password:"123",
-       rol: 'usuario'
-   },
-   {
-       nombre: 'Eve', password:"123",
-       rol: 'usuario'
-   },
-   {
-       nombre: 'Admin', password:"codercoder",
-       rol: 'admin'
-   },
-]
-
 router.get('/', async (req, res) => {
    let {nombre, password}=req.query;
    if (!nombre || !password){

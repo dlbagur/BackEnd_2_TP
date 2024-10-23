@@ -12,7 +12,6 @@ router.get('/',(req,res)=>{
 
 router.get('/login', async (req, res) => {
     try {
-        // const products = await ProductsManager.getproducts();
         res.status(200).render('login', {isLogin:req.session.usuario});
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -21,7 +20,6 @@ router.get('/login', async (req, res) => {
 
 router.get('/registro', async (req, res) => {
     try {
-        // const products = await ProductsManager.getproducts();
         res.status(200).render('registro', {isLogin:req.session.usuario});
     } catch (error) {
         res.status(500).json({ error: error.message });
