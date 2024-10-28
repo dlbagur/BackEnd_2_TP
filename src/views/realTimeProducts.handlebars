@@ -112,6 +112,37 @@
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
-    <script src="/scripts/realTimeProducts.js"></script>
+    <script         
+        window.addEventListener("load", async () => {
+            try {
+                const response = await fetch("/api/products", {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                if (response.status === 401) {
+                    mostrarMensaje("Sesión expirada o no autorizado.");
+                    localStorage.removeItem("token");
+                    setTimeout(() => window.location.href = "/login", 2000);
+                    return;
+                }
+
+                const data = await response.json();
+                console.log(data);
+            } catch (error) {
+                console.error("Error al cargar los productos:", error);
+                mostrarMensaje("Error al cargar los productos.");
+            }
+        });
+
+        function mostrarMensaje(texto) {
+            const mensajesDiv = document.getElementById("mensajes");
+            mensajesDiv.textContent = texto;
+            setTimeout(() => mensajesDiv.textContent = "", 3000);
+        }
+    </script>
 </body>
 </html>

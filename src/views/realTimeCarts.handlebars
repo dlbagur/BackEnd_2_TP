@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{{!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -52,5 +52,103 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="/scripts/realTimeCarts.js"></script>
+</body>
+</html> --}}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carts en Tiempo Real</title>
+    <link rel="stylesheet" href="../public/estilos/estilos.css">
+</head>
+<body>
+    <div id="mensajes"></div>
+
+    {{#if cart}}
+        <h1>One Cart</h1>
+        <p>Cart id: {{cart._id}}</p>
+        <ul>
+            {{#each cart.productos}}
+                <li>
+                    <span>Id: {{this.producto._id}}</span> -
+                    <span>Producto: {{this.producto.code}}</span> -
+                    <span>Bodega: {{this.producto.title}}</span> -
+                    <span>Cantidad: {{this.quantity}}</span> -
+                    <span>Precio: ${{this.producto.price}}</span>
+                </li>
+            {{/each}}
+        </ul>
+    {{else}}
+        <h1>All Carts</h1>
+        <ul id="carts-list">
+            {{#each carts}}
+                <li class="card-io" data-id="{{this._id}}">
+                    <span class="cart-code-io">Carrito ID: {{this._id}}</span>
+                    <br>
+                    <span>Productos:</span>
+                    <ul>
+                        {{#each this.productos}}
+                            <li>
+                                <span>Id: {{this.producto._id}}</span> -
+                                <span>Producto: {{this.producto.code}}</span> -
+                                <span>Bodega: {{this.producto.title}}</span> - 
+                                Cantidad: {{this.quantity}}
+                            </li>
+                        {{/each}}
+                    </ul>
+                    <div class="dropdown">
+                        <button class="dropdown-btn">Opciones</button>
+                        <div class="dropdown-menu">
+                            <a href="#" class="delete-btn" data-id="{{this._id}}">Eliminar</a>
+                        </div>
+                    </div>
+                </li>
+            {{/each}}
+        </ul>
+    {{/if}}
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        window.addEventListener("load", async () => {
+            const token = localStorage.getItem("token");
+
+            if (!token) {
+                mostrarMensaje("No estás autorizado. Redirigiendo al login...");
+                setTimeout(() => window.location.href = "/login", 2000);
+                return;
+            }
+
+            try {
+                const response = await fetch("/api/carts", {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                if (response.status === 401) {
+                    mostrarMensaje("Sesión expirada o no autorizado.");
+                    localStorage.removeItem("token");
+                    setTimeout(() => window.location.href = "/login", 2000);
+                    return;
+                }
+
+                const data = await response.json();
+                console.log(data);
+            } catch (error) {
+                console.error("Error al cargar el carrito:", error);
+                mostrarMensaje("Error al cargar el carrito.");
+            }
+        });
+
+        function mostrarMensaje(texto) {
+            const mensajesDiv = document.getElementById("mensajes");
+            mensajesDiv.textContent = texto;
+            setTimeout(() => mensajesDiv.textContent = "", 3000);
+        }
+    </script>
 </body>
 </html>

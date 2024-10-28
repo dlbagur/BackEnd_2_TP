@@ -18,6 +18,7 @@ import { auth } from './middleware/auth.js';
 import FileStore from "session-file-store"
 import MongoStore from "connect-mongo"
 
+
 const PORT=config.PORT;
 const app=express();
 
@@ -30,11 +31,7 @@ const serverHTTP = app.listen(PORT, () => {
 const io = new Server(serverHTTP);
 
 // Configuración de Handlebars
-app.engine('handlebars', engine({
-    helpers: {
-        eq: (a, b) => a === b
-    }
-}));
+app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');
 app.set('views', './src/views');
 
@@ -55,14 +52,14 @@ app.use(sessions({
         }
     )
 }))
+// Passport
 initPassport()
 app.use(passport.initialize())
-app.use(passport.session())
 
 // Rutas
 app.use('/', vistasRouter);
-app.use('/api/products', productsRouter);
-app.use('/api/carts', cartsRouter);
+app.use('/api/products', auth, productsRouter);
+app.use('/api/carts', auth, cartsRouter);
 app.use('/api/sessions', sessionsRouter);
 app.use('/cookies', cookiesRouter);
 

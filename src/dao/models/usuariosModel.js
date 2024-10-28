@@ -9,11 +9,12 @@ export const usuariosModel=mongoose.model(
             email: {type: String, unique: true},
             age: Number,
             password: String,
-            cart: Number,
+            cart: String,
             rol: {type: String, default:"user"}
         },
         {
             timestamps: true, 
+            strict: false
         }
     )
 )

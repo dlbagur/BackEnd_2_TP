@@ -3,7 +3,6 @@ const inputApellido=document.getElementById("apellido");
 const inputEmail=document.getElementById("email");
 const inputEdad=document.getElementById("edad");
 const inputPassword=document.getElementById("password");
-const inputCart=document.getElementById("cart");
 const inputRol=document.getElementById("rol");
 const btnSubmit=document.getElementById("btnSubmit");
 const divMensajes=document.getElementById("mensajes");
@@ -15,7 +14,7 @@ btnSubmit.addEventListener("click", async (e)=>{
     let email=inputEmail.value;
     let edad=inputEdad.value;
     let password=inputPassword.value;
-    let cart=inputCart.value;
+    let cart="";
     let rol=inputRol.value;
     if(!nombre || !apellido || !email || !password){
         alert("Complete los datos")
@@ -26,7 +25,7 @@ btnSubmit.addEventListener("click", async (e)=>{
         return
     }
 
-    let body= {nombre, apellido, email, password, edad, cart, rol}
+    let body= {nombre, apellido, email, password, edad, rol}
 
     let respuesta = await fetch("/api/sessions/registro", {
         method: "post",
@@ -43,6 +42,10 @@ btnSubmit.addEventListener("click", async (e)=>{
             divMensajes.textContent=""
         },3000)
     } else {
-        window.location.href=`/login?Registro exitoso para ${datos.nuevoUsuario.email}`
+        divMensajes.textContent=`/login?Registro exitoso para ${datos.nuevoUsuario.email}`
+        alert("Registro Exitoso")
+        setTimeout(()=> {
+            divMensajes.textContent=""
+        },3000)
     }
 })

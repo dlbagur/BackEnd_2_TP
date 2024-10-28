@@ -14,33 +14,33 @@ if(mensaje){
 
 btnSubmit.addEventListener("click", async(e)=>{
     e.preventDefault()
+
     let email=inputEmail.value 
     let password=inputPassword.value 
     if(!email || !password){
-        alert("Complete los datos de ingreso")
+        alert("Complete los datos de ingreso.")
         return 
     }
-    let body={
+
+    const body={
         email:email.toLowerCase(),
         password
     }
 
     let respuesta=await fetch("/api/sessions/login", {
-        method:"POST", 
+        method:"post", 
         headers:{
             "Content-Type":"application/json"
         },
-        body: JSON.stringify(body)
+        body:JSON.stringify(body)
     })
-
-    let datos=await respuesta.json()
-
     if(respuesta.status>=400){
-        divMensajes.textContent=datos.error
-        setTimeout(() => {
-            divMensajes.textContent=""
-        }, 3000);
-    } else {
-        window.location.href=`/perfil`
+        let {error}=await respuesta.json()
+        alert(error)
+        return 
+    }else{
+        let datos=await respuesta.json()
+        console.log(datos)
+        alert(datos.payload)
     }
 })
