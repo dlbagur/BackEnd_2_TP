@@ -8,7 +8,12 @@ document.addEventListener('DOMContentLoaded', () => {
             socket.emit('vaciarCarrito', idCarrito);
         }
     });
-
+    const irAlMenuBtn = document.getElementById('irAlMenu');
+    if (irAlMenuBtn) {
+        irAlMenuBtn.addEventListener('click', () => {
+            window.location.href = "/"
+        });
+    }
     socket.on('vaciarCarrito', (idCarrito) => {
         const cartsList = document.getElementById('carts-list');
         const itemToRemove = cartsList.querySelector(`li[data-id="${idCarrito}"]`);
