@@ -46,11 +46,12 @@ router.post("/login",
 
 router.get("/logout",
     (req, res)=>{
-    req.session.destroy(error=>{
+        req.session.destroy(error=>{
         if(error){
             res.setHeader('Content-Type','application/json');
             return res.status(500).json({error:`Error al efectuar el logout`})
         } else{
+            res.clearCookie('tokenCookie');
             res.setHeader('Content-Type','application/json');
             return res.status(200).json({payload:"Logout exitoso. Esperamos verlo de nuevo por aca"});
         }
