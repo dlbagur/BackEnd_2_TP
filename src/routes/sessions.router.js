@@ -7,7 +7,8 @@ import jwt from "jsonwebtoken";
 
 export const router=Router()
 
-router.get("/error", (req, res)=>{
+router.get("/error", 
+    (req, res)=>{
     res.setHeader('Content-Type','application/json');
     return res.status(401).json({error:`Error de autenticación.`})
 })
@@ -43,18 +44,21 @@ router.post("/login",
     }
 )
 
-router.get("/logout", (req, res)=>{
-    let {web}=req.query
+router.get("/logout",
+    (req, res)=>{
     req.session.destroy(error=>{
         if(error){
             res.setHeader('Content-Type','application/json');
             return res.status(500).json({error:`Error al efectuar el logout`})
-        }
-        if(web){
-            return res.redirect("/login?mensaje=Logout exitoso")
-        }else{
+        } else{
             res.setHeader('Content-Type','application/json');
             return res.status(200).json({payload:"Logout exitoso. Esperamos verlo de nuevo por aca"});
         }
     })
+})
+
+router.get("/current",
+     passport.authenticate("current", {session:false}), (req, res)=>{
+    res.setHeader('Content-Type','application/json');
+    return res.status(200).json({datosUsuarioLogueado:req.user});
 })

@@ -3,6 +3,7 @@ const socket = io();
 document.addEventListener('DOMContentLoaded', () => {
     const addProductModal = document.getElementById('addProductModal');
     const openAddProductModalBtn = document.getElementById('openAddProductModal');
+    const irAlMenuBtn = document.getElementById('irAlMenu');
     const closeAddProductModalBtns = document.querySelectorAll('.modal .close');
     const editProductModal = document.getElementById('productModal');
     const formAgregarProducto = document.getElementById('form-agrego-producto');
@@ -13,6 +14,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let skip = 0;
     const limit = 10;
 
+    // Vuelvo al menú principal
+    if (irAlMenuBtn) {
+        irAlMenuBtn.addEventListener('click', () => {
+            window.location.href = "/"
+        });
+    }
+    
     // Abro el modal de agregar producto
     if (openAddProductModalBtn) {
         openAddProductModalBtn.addEventListener('click', () => {
@@ -147,6 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.target.classList.contains('edit-btn')) {
                 currentEditId = idProducto;
                 const card = e.target.closest('.card-io');
+                console.log(card.querySelector('.product-code-io'));
                 if (card) {
                     document.getElementById('edit-product-code').value = card.querySelector('.product-code-io').textContent.trim();
                     document.getElementById('edit-product-category').value = card.querySelector('.product-category-io').textContent.trim();

@@ -21,7 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-
     // Abro el modal de agregar producto
     if (openAddProductModalBtn) {
         openAddProductModalBtn.addEventListener('click', () => {

@@ -58,10 +58,8 @@
     </div>
 
     <div class="container">
-        <!-- Botón para agregar producto -->
             <button id="openAddProductModal" class="add-btn">Agregar Producto</button>
-        <!-- Botón para volver al Menú-->
-            <button id="irAlMenu" class="irAlMenu">Salir al Menú</button>
+            <button id="irAlMenu" class="irAlMenu">Volver al Menú</button>
     </div>
 
     <!-- Modal para modificar un producto -->
@@ -135,7 +133,7 @@
                 console.error("Error al cargar los productos:", error);
                 mostrarMensaje("Error al cargar los productos.");
             }
-        });
+        };
 
         function mostrarMensaje(texto) {
             const mensajesDiv = document.getElementById("mensajes");
