@@ -4,10 +4,20 @@
 // Client secret: b4e68fd8b704db3c39b0fa2943461ac879c1ae2e
 
 import passport from "passport";
+import passportJWT from "passport-jwt"
 import local from "passport-local"
 import { UsuariosManager } from "../dao/UsuariosManager.js";
 import github from "passport-github2"
 import { generaHash, validaHash } from "../utils.js";
+import { config } from "../config/config,js";
+
+const buscarToken=req=>{
+    let token=null
+    if(req.cookies.tokenCookie){
+        token = req.cookies.tokenCookie
+    }
+    return token
+}
 
 export const initPassport = () => {
 
@@ -93,6 +103,22 @@ export const initPassport = () => {
                         return done(null, false, "Credenciales inválidas")
                     }
                     delete usuario.password
+                    return done(null, usuario)
+                } catch (error) {
+                    return done(error)
+                }
+            }
+        )
+    )
+
+    passport.use("current", 
+        new passportJWT.Strategy(
+            {
+                secretOrKey: config.SECRET,
+                jwtFromRequest: new passportJWT.ExtractJwt.fromExtractors([buscarToken])
+            },
+            async(usuario, done)=> {
+                try {
                     return done(null, usuario)
                 } catch (error) {
                     return done(error)

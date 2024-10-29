@@ -35,7 +35,7 @@ router.post("/login",
     passport.authenticate("login", {session: false, failureRedirect:"/api/sessions/error"}), 
     (req, res)=>{
         let token=jwt.sign(req.user, config.SECRET, {expiresIn:3600})
-        res.cookie("tokenCookie", token)
+        res.cookie("tokenCookie", token, {httpOnly:true})
         res.setHeader('Content-Type','application/json');
         res.status(201).json({
             payload:`Ingreso exitoso para ${req.user.nombre}`, 

@@ -34,18 +34,13 @@ btnSubmit.addEventListener("click", async (e)=>{
         },
         body: JSON.stringify(body)
     })
-
-    let datos = await respuesta.json()
     if (respuesta.status>=400){
         divMensajes.textContent=datos.error;
         setTimeout(()=> {
             divMensajes.textContent=""
         },3000)
     } else {
-        divMensajes.textContent=`/login?Registro exitoso para ${datos.nuevoUsuario.email}`
-        alert("Registro Exitoso")
-        setTimeout(()=> {
-            divMensajes.textContent=""
-        },3000)
+        let datos=await respuesta.json(9)
+        alert(datos.payload)
     }
 })

@@ -18,7 +18,6 @@ import { auth } from './middleware/auth.js';
 import FileStore from "session-file-store"
 import MongoStore from "connect-mongo"
 
-
 const PORT=config.PORT;
 const app=express();
 
@@ -58,10 +57,9 @@ app.use(passport.initialize())
 
 // Rutas
 app.use('/', vistasRouter);
-app.use('/api/products', auth, productsRouter);
-app.use('/api/carts', auth, cartsRouter);
+app.use('/api/products', passport.authenticate("current", {session:false}), productsRouter);
+app.use('/api/carts', passport.authenticate("current", {session:false}), cartsRouter);
 app.use('/api/sessions', sessionsRouter);
-app.use('/cookies', cookiesRouter);
 
 io.on('connection', (socket) => {
     console.log('Nuevo cliente conectado');

@@ -113,9 +113,9 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script         
-        window.addEventListener("load", async () => {
+        window.addEventListener("load", async() => {
             try {
-                const response = await fetch("/api/products", {
+                const response = fetch("/api/products", {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${token}`,
@@ -127,10 +127,9 @@
                     mostrarMensaje("Sesión expirada o no autorizado.");
                     localStorage.removeItem("token");
                     setTimeout(() => window.location.href = "/login", 2000);
-                    return;
                 }
-
-                const data = await response.json();
+//                const data = await response.json();
+                const data = response.json();
                 console.log(data);
             } catch (error) {
                 console.error("Error al cargar los productos:", error);

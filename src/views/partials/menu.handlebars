@@ -1,27 +1,20 @@
         <ul id="menu-list">
             <li>
-                <a href="/">Pagina de Inicio</a>
+                <a href="/registro">Registro</a>
             </li>
-
-            {{#if isLogin}}
-                <li>
-                    <a href="/realtimeproducts">Products</a>
-                </li>
-                <li>
-                    <a href="/perfil?web=1">Perfil</a>
-                </li>
-                <li>
-                    <a href="/api/sessions/logout?web=1">Logout</a>
-                </li>
-            {{else}}
-                <li>
-                    <a href="/registro">Registro</a>
-                </li>
-                <li>
-                    <a href="/login">Login</a>
-                </li>
-                <li>
-                    <a href="/api/sessions/github">Acceder con Github</a>
-                </li>
-            {{/if}}
+            <li>
+                <a href="/login">Login</a>
+            </li>
+            <li>
+                <a href="/api/sessions/github">Acceder con Github</a>
+            </li>
+            <li>
+                <a href="/api/products">Products</a>
+            </li>
+            <li>
+                <a href="/api/cats">Carrito</a>
+            </li>
+            <li>
+                <a href="/api/sessions/logout?web=1">Logout</a>
+            </li>
        </ul>

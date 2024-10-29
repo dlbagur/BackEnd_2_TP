@@ -7,12 +7,12 @@ import { auth } from '../middleware/auth.js';
 const router = Router();
 
 router.get('/',(req,res)=>{
-    res.status(200).render('home', {isLogin:req.session.usuario})
+    res.status(200).render('home')
 })
 
 router.get('/login', async (req, res) => {
     try {
-        res.status(200).render('login', {isLogin:req.session.usuario});
+        res.status(200).render('login');
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -20,7 +20,7 @@ router.get('/login', async (req, res) => {
 
 router.get('/registro', async (req, res) => {
     try {
-        res.status(200).render('registro', {isLogin:req.session.usuario});
+        res.status(200).render('registro');
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
