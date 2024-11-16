@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const editProductModal = document.getElementById('productModal');
     const formAgregarProducto = document.getElementById('form-agrego-producto');
     const formModificarProducto = document.getElementById('form-modificar-producto');
+
     let productoPendiente = null;
     let currentEditId = null;
 
@@ -143,7 +144,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (productList) {
         productList.addEventListener('click', (e) => {
             const idProducto = e.target.getAttribute('data-id');
-
             if (!idProducto) return;
 
             // Clic en eliminar producto
@@ -155,15 +155,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.target.classList.contains('edit-btn')) {
                 currentEditId = idProducto;
                 const card = e.target.closest('.card-io');
-                console.log(card.querySelector('.product-code-io'));
                 if (card) {
-                    document.getElementById('edit-product-code').value = card.querySelector('.product-code-io').textContent.trim();
-                    document.getElementById('edit-product-category').value = card.querySelector('.product-category-io').textContent.trim();
-                    document.getElementById('edit-product-title').value = card.querySelector('.product-title-io').textContent.trim();
-                    document.getElementById('edit-product-description').value = card.querySelector('.product-description-io').textContent.trim();
-                    document.getElementById('edit-product-price').value = card.querySelector('.product-price-io').textContent.trim();
-                    document.getElementById('edit-product-stock').value = card.querySelector('.product-stock-io').textContent.trim();
+                    document.getElementById('edit-product-code').value = card.querySelector('.product-code').textContent.trim();
+                    document.getElementById('edit-product-category').value = card.querySelector('.product-category').textContent.trim();
+                    document.getElementById('edit-product-title').value = card.querySelector('.product-title').textContent.trim();
+                    document.getElementById('edit-product-description').value = card.querySelector('.product-description').textContent.trim();
+                    document.getElementById('edit-product-price').value = card.querySelector('.product-price').textContent.trim();
+                    document.getElementById('edit-product-stock').value = card.querySelector('.product-stock').textContent.trim();
                     editProductModal.style.display = 'block';
+                } else {
+                    console.error('Error: No se pudo encontrar la tarjeta del producto');
                 }
             }
 
@@ -176,8 +177,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
             if (e.target.classList.contains('add-cart-btn')) {
-                let cart = "66e62eb3a973a75814533678";
+                let cart = localStorage.getItem('cartId');
                 let idProducto = e.target.getAttribute('data-id');
+                if (!cart) {
+                    alert("No se ha encontrado un carrito asociado al usuario.");
+                    return;
+                }                
                 socket.emit('agregarProductoAlCart', { cart: cart, idProducto: idProducto });
             }
             
@@ -212,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        socket.emit('modificarProducto', { _id: currentEditId, ...updatedProduct });
+        socket.emit('modificarProductoP', { _id: currentEditId, ...updatedProduct });
         editProductModal.style.display = 'none';
     });
 
@@ -251,16 +256,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Actualizar un producto modificado
-    socket.on('productoModificado', (producto) => {
+    socket.on('modificarProductoPag', (producto) => {
+        console.log("Producto modificado:", producto);
         const itemToUpdate = productList.querySelector(`li[data-id="${producto._id}"]`);
         if (itemToUpdate) {
-            itemToUpdate.querySelector('.product-code-io').textContent = producto.code;
-            itemToUpdate.querySelector('.product-category-io').textContent = producto.category;
-            itemToUpdate.querySelector('.product-title-io').textContent = producto.title;
-            itemToUpdate.querySelector('.product-description-io').textContent = producto.description;
-            itemToUpdate.querySelector('.product-price-io').textContent = producto.price;
-            itemToUpdate.querySelector('.product-stock-io').textContent = producto.stock;
+            itemToUpdate.innerHTML = `
+                <span class="product-code-io">${producto.code}</span><br> 
+                <span class="product-category-io">${producto.category}</span> - 
+                <span class="product-title-io">${producto.title}</span><br>
+                <span class="product-description-io">${producto.description}</span><br> 
+                Precio: $<span class="product-price-io">${producto.price}</span> - 
+                Stock: <span class="product-stock-io">${producto.stock}</span>
+                <div class="dropdown">
+                    <button class="dropdown-btn">Opciones</button>
+                    <div class="dropdown-menu">
+                        <a href="#" class="edit-btn" data-id="${producto._id}">Modificar</a>
+                        <a href="#" class="delete-btn" data-id="${producto._id}">Eliminar</a>
+                        <a href="#" class="add-cart-btn" data-id="${producto._id}">Agregar al Carrito</a>
+                    </div>
+                </div>
+            `;
         }
     });
+
 });

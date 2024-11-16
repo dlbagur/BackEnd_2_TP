@@ -29,10 +29,10 @@ btnSubmit.addEventListener("click", async(e)=>{
 
     let respuesta=await fetch("/api/sessions/login", {
         method:"post", 
+        body:JSON.stringify(body),
         headers:{
             "Content-Type":"application/json"
         },
-        body:JSON.stringify(body)
     })
     if(respuesta.status>=400){
         let {error}=await respuesta.json()
@@ -41,6 +41,8 @@ btnSubmit.addEventListener("click", async(e)=>{
     }else{
         let datos=await respuesta.json()
         console.log(datos)
+        localStorage.setItem('cartId', datos.cart);
+        console.log("cartId: ", datos.cart)
         alert(datos.payload)
     }
 })

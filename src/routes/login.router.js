@@ -17,7 +17,7 @@ router.get('/', async (req, res) => {
 
    req.session.usuario=usuario;
    res.setHeader('Content-Type','application/json');
-   return res.status(200).json({payload:`Login exitoso para ${usuario.nombre}`});
+   return res.status(200).json({payload:`Ingreso exitoso para ${usuario.nombre}`});
 });
 
 router.get('/datos', auth, (req,res)=>{

@@ -5,13 +5,29 @@ import { io } from '../app.js';
 
 const router = Router();
 
+// router.get('/', async (req, res) => {
+//     try {
+//         let carts = await CartsManager.getCarts();
+//         if (!carts || carts.length === 0) {
+//             return res.status(400).json({ error: `No existen carritos para mostrar` });
+//         }
+//         res.render('realTimeCarts', { carts });
+//     } catch (error) {
+//         res.status(500).json({ error: `Error inesperado en el servidor: ${error.message}` });
+//     }
+// });
+
 router.get('/', async (req, res) => {
     try {
-        let carts = await CartsManager.getCarts();
-        if (!carts || carts.length === 0) {
-            return res.status(400).json({ error: `No existen carritos para mostrar` });
+        const cartId = req.cookies.cartId;
+        if (!cartId) {
+            return res.status(400).json({ error: `No hay un carrito asociado` });
+        }        
+        let cart = await CartsManager.getCartById(cartId);
+        if (!cart) {
+            return res.status(400).json({ error: `No existe carrito para mostrar` });
         }
-        res.render('realTimeCarts', { carts });
+        res.render('realTimeCarts', { carts: [cart] });
     } catch (error) {
         res.status(500).json({ error: `Error inesperado en el servidor: ${error.message}` });
     }
@@ -95,6 +111,23 @@ router.delete('/:cid/products/:pid', async (req, res) => {
         return res.status(200).json({ message: `Producto eliminado del carrito`, cart: updatedCart });
     } catch (error) {
         res.status(500).json({ error: `Error: ${error.message}` });
+    }
+});
+
+router.post('/:cid/purchase', async (req, res) => {
+    let { cid } = req.params;
+    if (!isValidObjectId(cid)) {
+        return res.status(400).json({ error: `ID con formato inválido` });
+    }
+    try {
+        let cart = await CartsManager.getCartById(cid);
+        if (!cart) {
+            return res.status(400).json({ error: `No existe el carrito con ID ${cid}` });
+        }
+        let { compra, sinStock } = await CartsManager.purchaseCart(cid);
+        return res.status(200).json({ message: `Compra efectuada`, compra, sinStock });
+    } catch (error) {
+        res.status(500).json({ error: `Error inesperado en el servidor: ${error.message}` });
     }
 });
 

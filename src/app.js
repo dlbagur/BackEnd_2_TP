@@ -8,15 +8,16 @@ import productsManager from "./dao/ProductsManager.js"
 import cartsRouter from './routes/carts.router.js';
 import CartsManager from './dao/CartsManager.js';
 import { router as vistasRouter } from './routes/vistas.routers.js';
-import { router as sessionsRouter } from './routes/sessions.router.js'
+import { router as sessionsRouter } from './routes/sessions.router.js';
 import cookieParser from 'cookie-parser';
 import cookiesRouter from './routes/cookies.router.js';
+import { auth, auth2 } from './middleware/auth.js';
 import sessions from 'express-session';
-import passport from "passport"
+import passport from "passport";
 import { initPassport } from './config/passport.config.js';
-import { auth } from './middleware/auth.js';
-import FileStore from "session-file-store"
-import MongoStore from "connect-mongo"
+import { passportCall } from './utils.js';
+import FileStore from "session-file-store";
+import MongoStore from "connect-mongo";
 
 const PORT=config.PORT;
 const app=express();
@@ -28,6 +29,7 @@ const serverHTTP = app.listen(PORT, () => {
 });
 
 const io = new Server(serverHTTP);
+
 
 // Configuración de Handlebars
 app.engine('handlebars', engine());
@@ -51,14 +53,16 @@ app.use(sessions({
         }
     )
 }))
+
 // Passport
 initPassport()
 app.use(passport.initialize())
 
 // Rutas
 app.use('/', vistasRouter);
-app.use('/api/products', passport.authenticate("current", {session:false}), productsRouter);
-app.use('/api/carts', passport.authenticate("current", {session:false}), cartsRouter);
+
+app.use('/api/products', passportCall("current"), auth2(["user", "admin"]), productsRouter);
+app.use('/api/carts', passportCall("current"), auth("user"), cartsRouter);
 app.use('/api/sessions', sessionsRouter);
 
 io.on('connection', (socket) => {
@@ -86,6 +90,7 @@ io.on('connection', (socket) => {
 
     socket.on('modificarProducto', async (producto) => {
         try {
+            console.log("Modificar Producto: ", producto)
             const { _id, ...dataToUpdate } = producto;
             const aModificarProducto = await productsManager.updateproduct(_id, dataToUpdate);
             io.emit('productoModificado', producto);
@@ -95,9 +100,21 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on('modificarProductoP', async (producto) => {
+        try {
+            const { _id, ...dataToUpdate } = producto;
+            const aModificarProducto = await productsManager.updateproduct(_id, dataToUpdate);
+            socket.emit('modificarProductoPag', producto);
+        } catch (error) {
+            console.log("Error ", error)
+            socket.emit('error', 'Error al modificar producto');
+        }
+    });
+
     socket.on('eliminarProducto', async (idProducto) => {
         try {
             await productsManager.deleteproduct(idProducto);
+            console.log("Eliminar producto:" , idProducto)
             io.emit('eliminarProducto', idProducto);
         } catch (error) {
             socket.emit('error', 'Error al eliminar producto');

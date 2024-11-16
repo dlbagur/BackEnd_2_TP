@@ -7,6 +7,7 @@ const inputRol=document.getElementById("rol");
 const btnSubmit=document.getElementById("btnSubmit");
 const divMensajes=document.getElementById("mensajes");
 
+
 btnSubmit.addEventListener("click", async (e)=>{
     e.preventDefault()
     let nombre=inputNombre.value;
@@ -27,20 +28,28 @@ btnSubmit.addEventListener("click", async (e)=>{
 
     let body= {nombre, apellido, email, password, edad, rol}
 
-    let respuesta = await fetch("/api/sessions/registro", {
-        method: "post",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify(body)
-    })
-    if (respuesta.status>=400){
-        divMensajes.textContent=datos.error;
-        setTimeout(()=> {
-            divMensajes.textContent=""
-        },3000)
-    } else {
-        let datos=await respuesta.json(9)
-        alert(datos.payload)
+    try {
+        let respuesta = await fetch("/api/sessions/registro", {
+            method: "post",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(body)
+        });
+
+        let datos = await respuesta.json();
+
+        if (respuesta.status >= 400) {
+            divMensajes.textContent = datos.error;
+            setTimeout(() => {
+                divMensajes.textContent = "";
+            }, 3000);
+        } else {
+            alert(datos.message);
+            console.log("Usuario registrado:", datos.usuario);
+        }
+    } catch (error) {
+        console.error("Error en el registro:", error);
+        alert("Ocurrió un error al registrarse. Por favor, intente nuevamente.");
     }
 })

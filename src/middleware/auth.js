@@ -1,20 +1,43 @@
 import jwt from "jsonwebtoken"
 import { config } from "../config/config,js";
 
-export const auth=(req, res, next)=>{
-    if(!req.cookies.tokenCookie){
-        res.setHeader('Content-Type','application/json');
-        return res.status(401).json({error:`Acceso no autorizado - no llega Token`})
+export const auth=rol=>{
+
+    return (req, res, next)=>{
+        if(!req.user || !req.user?.rol) {
+            res.setHeader('Content-Type','application/json');
+            return res.status(403).json({error:`Sin autorización `})
         }
 
-    let token = req.cookies.tokenCookie
-
-    try {
-        req.user = jwt.verify(token, config.SECRET)
-    } catch (error) {
-        res.setHeader('Content-Type','application/json');
-        return res.status(401).json({error:`Unauthorized`, detalle:error.message})
+        if(req.user.rol!==rol){
+            res.setHeader('Content-Type','application/json');
+            return res.status(403).json({error:`Sin autorización `})
+        }
+        next()
     }
+}
 
-    next()
+export const auth2=(roles=[])=>{
+    return (req, res, next)=>{
+        if(!Array.isArray(roles)){
+            res.setHeader('Content-Type','application/json');
+            return res.status(500).json({error:`Error en los permisos de la ruta`})
+        }
+        roles=roles.map(rol=>rol.toLowerCase())
+        if(roles.includes("public")){
+            return next()
+        } 
+
+        if(!req.user || !req.user?.rol){
+            res.setHeader('Content-Type','application/json');
+            return res.status(403).json({error:`No autorizado - no hay rol`})
+        }
+        
+        if(!roles.includes(req.user.rol.toLowerCase())){
+            res.setHeader('Content-Type','application/json');
+            return res.status(403).json({error:`No autorizado - privilegios insuficientes`})
+        }
+
+        next()
+    }
 }

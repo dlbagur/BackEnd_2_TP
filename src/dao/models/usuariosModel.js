@@ -9,7 +9,7 @@ export const usuariosModel=mongoose.model(
             email: {type: String, unique: true},
             age: Number,
             password: String,
-            cart: String,
+            cart: { type: mongoose.Schema.Types.ObjectId, ref: "carts" },
             rol: {type: String, default:"user"}
         },
         {

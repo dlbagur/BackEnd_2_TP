@@ -1,6 +1,7 @@
-import mongoose from 'mongoose';
+import mongoose, { now } from 'mongoose';
 import { cartsModelo } from './models/cartsModel.js';
 import { productosModelo } from './models/productsModel.js';
+import { ticketsModelo } from './models/ticketsModel.js';
 
 class CartsManager {
 
@@ -100,6 +101,109 @@ class CartsManager {
         await cart.save();
         return cart;
     }
+
+    // static async purchaseCart(cartId) {
+    //     let cart;
+    //     let compra = [];
+    //     let sinStock = [];
+    //     let totalCompra = 0;
+    //     try {
+    //         cart = await cartsModelo.findById(cartId);
+    //         if (!cart) {
+    //             throw new Error(`No existe un carrito con el ID ${cartId}`);
+    //         }
+    //     } catch (error) {
+    //         throw new Error(`Error al recuperar el carrito: ${error.message}`);
+    //     }
+
+    //     for (let i = 0; i < cart.productos.length; i++) {
+    //         try {
+    //             let prodId = cart.productos[i].producto._id;
+    //             let productoStock = await productosModelo.findById(prodId);
+    //             if (!productoStock) {
+    //                 throw new Error(`No existe producto con el ID ${prodId}`);
+    //             }
+    //             if (productoStock.stock >= cart.productos[i].quantity) {
+    //                 compra.push(cart.productos[i]);
+    //                 productoStock.stock -= cart.productos[i].quantity;
+    //                 totalCompra += cart.productos[i].quantity * productoStock.price;
+    //                 cart.productos[i].comprado = true;
+    //                 await productoStock.save();
+    //             } else {
+    //                 sinStock.push(prodId);
+    //                 cart.productos[i].comprado = false;
+    //             }
+    //         } catch (error) {
+    //             throw new Error(`Error al recuperar el producto: ${error.message}`);
+    //         }
+    //     }
+
+    //     if (compra.length > 0) {
+    //         const total = compra.reduce((sum, item) => sum + item.quantity * item.producto.price, 0);
+    //         const ticket = await ticketsModel.create({
+    //             purchaser: cart.user, // Supone que el carrito tiene un campo `user` con el email
+    //             products: compra.map(p => ({ productId: p.producto._id, quantity: p.quantity })),
+    //             total
+    //         });
+    //         console.log('Ticket generado:', ticket);
+    //     }
+
+    //     await cart.save();
+    //     return { compra, sinStock };
+    // }
+
+    static async purchaseCart(cartId) {
+        let cart;
+        let compra = [];
+        let sinStock = [];
+        try {
+            cart = await cartsModelo.findById(cartId).populate('productos.producto');
+            if (!cart) {
+                throw new Error(`No existe un carrito con el ID ${cartId}`);
+            }
+        } catch (error) {
+            throw new Error(`Error al recuperar el carrito: ${error.message}`);
+        }
+    
+        for (let i = 0; i < cart.productos.length; i++) {
+            try {
+                let prodId = cart.productos[i].producto._id;
+                let productoStock = await productosModelo.findById(prodId);
+                if (!productoStock) {
+                    throw new Error(`No existe producto con el ID ${prodId}`);
+                }
+                if (productoStock.stock >= cart.productos[i].quantity) {
+                    compra.push(cart.productos[i]);
+                    productoStock.stock -= cart.productos[i].quantity;
+                    cart.productos[i].comprado = true;
+                    await productoStock.save();
+                } else {
+                    sinStock.push(prodId.toString());
+                    cart.productos[i].comprado = false;
+                }
+            } catch (error) {
+                throw new Error(`Error al recuperar el producto: ${error.message}`);
+            }
+        }
+    
+        // Genero un ticket si hubo productos comprados
+        if (compra.length > 0) {
+            const total = compra.reduce((sum, item) => sum + item.quantity * item.producto.price, 0);
+            const ticket = await ticketsModelo.create({
+                purchaser: cart.usuario,
+                amount: total,
+                purchase_datetime: Date.now
+            });
+            console.log('Ticket generado:', ticket);
+        }
+    
+        // Actualizo el carrito con productos sin stock
+        cart.productos = cart.productos.filter(p => sinStock.includes(p.producto._id.toString()));
+        await cart.save();
+    
+        return { compra, sinStock };
+    }
+    
 }
 
 export default CartsManager;

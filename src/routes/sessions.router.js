@@ -2,7 +2,9 @@ import { Router } from "express";
 import { UsuariosManager } from "../dao/UsuariosManager.js";
 import { generaHash, validaHash } from "../utils.js";
 import { config } from "../config/config,js";
+import { auth } from '../middleware/auth.js';
 import passport from 'passport';
+import { passportCall } from "../utils.js";
 import jwt from "jsonwebtoken";
 
 export const router=Router()
@@ -13,34 +15,39 @@ router.get("/error",
     return res.status(401).json({error:`Error de autenticación.`})
 })
 
-router.get("/github", 
-    passport.authenticate("github", {})
-)
+// router.get("/github", 
+//     passport.authenticate("github", {})
+// )
 
-router.get("/callbackGithub", 
-   passport.authenticate("github", {failureRedirect: "/api/sessions/error"}), (req, res)=>{
-        req.session.usuario=req.user
-        res.setHeader('Content-Type','application/json');
-        return res.status(200).json({payload:"Login exitoso con Github", usuarioLogueado: req.user});
-})
+// router.get("/callbackGithub", 
+//    passport.authenticate("github", {failureRedirect: "/api/sessions/error"}), (req, res)=>{
+//         req.session.usuario=req.user
+//         res.setHeader('Content-Type','application/json');
+//         return res.status(200).json({payload:"Login exitoso con Github", usuarioLogueado: req.user});
+// })
 
-router.post("/registro", 
-    passport.authenticate("registro", {session: false, failureRedirect:"/api/sessions/error"}), 
-    (req, res)=>{
+router.post("/registro",
+    //  passport.authenticate("registro", { session: false }),
+    passportCall("registro"),
+     (req, res)=>{
+        console.log("Usuario registrado:", req.user);
         res.setHeader('Content-Type','application/json');
-        return res.status(201).json({payload:`Registro exitoso para ${req.user.nombre}`, usuario: req.user});
+        return res.status(201).json({
+            message: `Registro exitoso para ${req.user.nombre}`,
+            usuario: req.user
+        });
+
     }
 )
 
 router.post("/login", 
-    passport.authenticate("login", {session: false, failureRedirect:"/api/sessions/error"}), 
+    passport.authenticate("login", {session: false, failureRedirect:"/api/sessions/error"}),
     (req, res)=>{
-        let token=jwt.sign(req.user, config.SECRET, {expiresIn:3600})
-        res.cookie("tokenCookie", token, {httpOnly:true})
+        let token=jwt.sign(req.user, config.SECRET, {expiresIn: 3600})
+        res.cookie("tokenCookie", token, {httpOnly:true});
+        res.cookie('cartId', req.user.cart, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
         res.setHeader('Content-Type','application/json');
-        res.status(201).json({
-            payload:`Ingreso exitoso para ${req.user.nombre}`, 
-            usuarioLogueado:req.user, token});
+        return res.status(201).json({payload:`Login exitoso para ${req.user.nombre}`, usuarioLogueado:req.user, cart: req.user.cart});
     }
 )
 
@@ -53,13 +60,14 @@ router.get("/logout",
         } else{
             res.clearCookie('tokenCookie');
             res.setHeader('Content-Type','application/json');
-            return res.status(200).json({payload:"Logout exitoso. Esperamos verlo de nuevo por aca"});
+            return res.status(200).json({
+                payload:"Logout exitoso. Esperamos verlo de nuevo por aca"});
         }
     })
 })
 
 router.get("/current",
-     passport.authenticate("current", {session:false}), (req, res)=>{
+    passportCall("current", auth("admin"), (req, res)=>{
     res.setHeader('Content-Type','application/json');
     return res.status(200).json({datosUsuarioLogueado:req.user});
-})
+}))

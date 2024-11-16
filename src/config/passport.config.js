@@ -10,6 +10,7 @@ import { UsuariosManager } from "../dao/UsuariosManager.js";
 import github from "passport-github2"
 import { generaHash, validaHash } from "../utils.js";
 import { config } from "../config/config,js";
+import { cartsModelo } from '../dao/models/cartsModel.js'
 
 const buscarToken=req=>{
     let token=null
@@ -20,32 +21,6 @@ const buscarToken=req=>{
 }
 
 export const initPassport = () => {
-
-    passport.use("github", 
-        new github.Strategy(
-            {
-                clientID:"Iv23lissPluQN9F8e7EZ",
-                clientSecret:"b4e68fd8b704db3c39b0fa2943461ac879c1ae2e",
-                callbackURL:"http://localhost:8080/api/sessions/callbackGithub"
-            },
-            async (token, rt, profile, done)=>{
-                try {
-                    console.log(profile)
-                    let {name, email}=profile._json
-                    if(!name || !email){
-                            return done(null, false)
-                    }
-                    let usuario=await UsuariosManager.getUserBy({email})
-                    if(!usuario){
-                        usuario=await UsuariosManager.createUser({nombre: name, email, profileGithub: profile})
-                    }
-                    return done(null, usuario)
-                } catch (error) {
-                    return done(error)
-                }
-            }
-        )
-    )
 
     passport.use("registro",
         new local.Strategy(
@@ -69,6 +44,13 @@ export const initPassport = () => {
                         return done(null, false, { message: "El email ya está registrado" });
                     }
 
+                    let carrito
+                    try { 
+                        carrito = await cartsModelo.create({ productos: [], usuario: username });
+                    } catch (error) {
+                        return done(null, false, { message: 'Error al crear el carrito: ' + error.message });
+                    }
+
                     const passwordHash = generaHash(password);
 
                     const nuevoUsuario = await UsuariosManager.createUser({
@@ -77,7 +59,8 @@ export const initPassport = () => {
                         email: username,
                         password: passwordHash,
                         edad,
-                        rol
+                        rol,
+                        cart: carrito._id
                     });
 
                     return done(null, nuevoUsuario);
@@ -95,14 +78,14 @@ export const initPassport = () => {
             },
             async(username, password, done)=>{
                 try {
-                    let usuario=await UsuariosManager.getUserBy({email:username})
+                    let usuario = await UsuariosManager.getUserBy({email:username})
                     if(!usuario){
                         return done(null, false, { message: "Debe ingresar los datos de acceso" });
                     }
                     if(!validaHash(password, usuario.password)){
                         return done(null, false, "Credenciales inválidas")
                     }
-                    delete usuario.password
+                    // delete usuario.password
                     return done(null, usuario)
                 } catch (error) {
                     return done(error)
