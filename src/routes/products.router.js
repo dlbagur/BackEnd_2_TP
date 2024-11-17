@@ -29,10 +29,21 @@ router.get("/", async (req, res) => {
   if (inStock === 'true') {
     filters.stock = { $gt: 0 };
   }
+
   try {
     const products = await productsManager.getproductsPaginate(skip, limit, page, sortOptions, filters);
+    const userRol = req.user?.rol || "guest";
+    const productsWithRoles = products.docs.map(product => ({
+      ...product,
+      userRol: req.user?.rol || "guest",
+      userIsAdmin: req.user?.rol === "admin",
+      userIsUser: req.user?.rol === "user"
+  }));
     res.render("productsPaginated", {
-      products: products.docs,
+      products: productsWithRoles,
+      userRol: req.user?.rol || "guest",
+      userIsAdmin: req.user?.rol === "admin",
+      userIsUser: req.user?.rol === "user",   
       page: products.page,
       totalPages: products.totalPages,
       hasNextPage: products.hasNextPage,
@@ -42,7 +53,7 @@ router.get("/", async (req, res) => {
       limit: limit,
       sort: sort,
       category: category,
-      inStock: inStock          
+      inStock: inStock
     });
     } catch (error) {
       res.setHeader("Content-Type", "application/json");

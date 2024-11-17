@@ -12,37 +12,74 @@ if(mensaje){
     }, 3000);
 }
 
-btnSubmit.addEventListener("click", async(e)=>{
-    e.preventDefault()
+// btnSubmit.addEventListener("click", async(e)=>{
+//     e.preventDefault()
 
-    let email=inputEmail.value 
-    let password=inputPassword.value 
-    if(!email || !password){
-        alert("Complete los datos de ingreso.")
-        return 
+//     let email=inputEmail.value 
+//     let password=inputPassword.value 
+//     if(!email || !password){
+//         alert("Complete los datos de ingreso.")
+//         return 
+//     }
+
+//     const body={
+//         email:email.toLowerCase(),
+//         password
+//     }
+
+//     let respuesta=await fetch("/api/sessions/login", {
+//         method:"post", 
+//         body:JSON.stringify(body),
+//         headers:{
+//             "Content-Type":"application/json"
+//         },
+//     })
+//     if(respuesta.status>=400){
+//         let {error}=await respuesta.json()
+//         alert(error)
+//         return 
+//     }else{
+//         let datos=await respuesta.json()
+//         console.log(datos)
+//         localStorage.setItem('cartId', datos.cart);
+//         console.log("cartId: ", datos.cart)
+//         alert(datos.payload)
+//     }
+// })
+
+btnSubmit.addEventListener("click", async (e) => {
+    e.preventDefault();
+
+    let email = inputEmail.value;
+    let password = inputPassword.value;
+    if (!email || !password) {
+        alert("Complete los datos de ingreso.");
+        return;
     }
 
-    const body={
-        email:email.toLowerCase(),
+    const body = {
+        email: email.toLowerCase(),
         password
-    }
+    };
 
-    let respuesta=await fetch("/api/sessions/login", {
-        method:"post", 
-        body:JSON.stringify(body),
-        headers:{
-            "Content-Type":"application/json"
+    let respuesta = await fetch("/api/sessions/login", {
+        method: "post",
+        body: JSON.stringify(body),
+        headers: {
+            "Content-Type": "application/json"
         },
-    })
-    if(respuesta.status>=400){
-        let {error}=await respuesta.json()
-        alert(error)
-        return 
-    }else{
-        let datos=await respuesta.json()
-        console.log(datos)
-        localStorage.setItem('cartId', datos.cart);
-        console.log("cartId: ", datos.cart)
-        alert(datos.payload)
+    });
+
+    if (respuesta.status >= 400) {
+        let { error } = await respuesta.json();
+        alert(error);
+        return;
+    } else {
+        let datos = await respuesta.json();
+        console.log(datos);
+        localStorage.setItem('cartId', datos.cart); // Guardar el cartId en localStorage
+        document.cookie = `cartId=${datos.cart}; path=/`; // Configurar la cookie
+        alert(datos.payload);
+        window.location.href = "/"; // Redirigir al menú principal
     }
-})
+});

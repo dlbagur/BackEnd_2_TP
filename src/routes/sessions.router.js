@@ -15,19 +15,7 @@ router.get("/error",
     return res.status(401).json({error:`Error de autenticación.`})
 })
 
-// router.get("/github", 
-//     passport.authenticate("github", {})
-// )
-
-// router.get("/callbackGithub", 
-//    passport.authenticate("github", {failureRedirect: "/api/sessions/error"}), (req, res)=>{
-//         req.session.usuario=req.user
-//         res.setHeader('Content-Type','application/json');
-//         return res.status(200).json({payload:"Login exitoso con Github", usuarioLogueado: req.user});
-// })
-
 router.post("/registro",
-    //  passport.authenticate("registro", { session: false }),
     passportCall("registro"),
      (req, res)=>{
         console.log("Usuario registrado:", req.user);
@@ -43,6 +31,12 @@ router.post("/registro",
 router.post("/login", 
     passport.authenticate("login", {session: false, failureRedirect:"/api/sessions/error"}),
     (req, res)=>{
+        const userPayload = {
+            id: req.user._id,
+            nombre: req.user.nombre,
+            email: req.user.email,
+            rol: req.user.rol,
+        };
         let token=jwt.sign(req.user, config.SECRET, {expiresIn: 3600})
         res.cookie("tokenCookie", token, {httpOnly:true});
         res.cookie('cartId', req.user.cart, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
@@ -66,8 +60,12 @@ router.get("/logout",
     })
 })
 
-router.get("/current",
-    passportCall("current", auth("admin"), (req, res)=>{
-    res.setHeader('Content-Type','application/json');
-    return res.status(200).json({datosUsuarioLogueado:req.user});
-}))
+router.get(
+    "/current",
+    passportCall("current"),
+    auth("admin"),
+    (req, res) => {
+        res.setHeader('Content-Type', 'application/json');
+        return res.status(200).json({ datosUsuarioLogueado: req.user });
+    }
+);

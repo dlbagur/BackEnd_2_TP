@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const editProductModal = document.getElementById('productModal');
     const formAgregarProducto = document.getElementById('form-agrego-producto');
     const formModificarProducto = document.getElementById('form-modificar-producto');
-
     let productoPendiente = null;
     let currentEditId = null;
 
@@ -21,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = "/"
         });
     }
-    
+
     // Abro el modal de agregar producto
     if (openAddProductModalBtn) {
         openAddProductModalBtn.addEventListener('click', () => {
@@ -46,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Recibo y muestro los productos paginados
-    socket.on('productsPaginatedResponse', (productosPaginados) => {
+    socket.on('realTimeProductsResponse', (productosPaginados) => {
         const productList = document.getElementById('product-list');
         productList.innerHTML = '';
 
@@ -85,14 +84,14 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('prevPage').addEventListener('click', () => {
         if (skip >= limit) {
             skip -= limit;
-            socket.emit('productsPaginatedRequest', { skip, limit });
+            socket.emit('realTimeProductsRequest', { skip, limit });
         }
     });
 
     // Botón de página siguiente
     document.getElementById('nextPage').addEventListener('click', () => {
         skip += limit;
-        socket.emit('productsPaginatedRequest', { skip, limit });
+        socket.emit('realTimeProductsRequest', { skip, limit });
     });
 
     // Valido producto antes de agregarlo
@@ -144,6 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (productList) {
         productList.addEventListener('click', (e) => {
             const idProducto = e.target.getAttribute('data-id');
+
             if (!idProducto) return;
 
             // Clic en eliminar producto
@@ -156,15 +156,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentEditId = idProducto;
                 const card = e.target.closest('.card-io');
                 if (card) {
-                    document.getElementById('edit-product-code').value = card.querySelector('.product-code').textContent.trim();
-                    document.getElementById('edit-product-category').value = card.querySelector('.product-category').textContent.trim();
-                    document.getElementById('edit-product-title').value = card.querySelector('.product-title').textContent.trim();
-                    document.getElementById('edit-product-description').value = card.querySelector('.product-description').textContent.trim();
-                    document.getElementById('edit-product-price').value = card.querySelector('.product-price').textContent.trim();
-                    document.getElementById('edit-product-stock').value = card.querySelector('.product-stock').textContent.trim();
+                    document.getElementById('edit-product-code').value = card.querySelector('.product-code-io').textContent.trim();
+                    document.getElementById('edit-product-category').value = card.querySelector('.product-category-io').textContent.trim();
+                    document.getElementById('edit-product-title').value = card.querySelector('.product-title-io').textContent.trim();
+                    document.getElementById('edit-product-description').value = card.querySelector('.product-description-io').textContent.trim();
+                    document.getElementById('edit-product-price').value = card.querySelector('.product-price-io').textContent.trim();
+                    document.getElementById('edit-product-stock').value = card.querySelector('.product-stock-io').textContent.trim();
                     editProductModal.style.display = 'block';
-                } else {
-                    console.error('Error: No se pudo encontrar la tarjeta del producto');
                 }
             }
 
@@ -176,16 +174,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     alert(`Error: ${data.message}`);
                 }
             });
+            
             if (e.target.classList.contains('add-cart-btn')) {
-                let cart = localStorage.getItem('cartId');
+                const cartId = req.cookies.cartId;
                 let idProducto = e.target.getAttribute('data-id');
-                if (!cart) {
-                    alert("No se ha encontrado un carrito asociado al usuario.");
-                    return;
-                }                
                 socket.emit('agregarProductoAlCart', { cart: cart, idProducto: idProducto });
             }
-            
         });
     }
 
@@ -217,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        socket.emit('modificarProductoP', { _id: currentEditId, ...updatedProduct });
+        socket.emit('modificarProducto', { _id: currentEditId, ...updatedProduct });
         editProductModal.style.display = 'none';
     });
 
@@ -256,27 +250,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    socket.on('modificarProductoPag', (producto) => {
-        console.log("Producto modificado:", producto);
+    // Actualizar un producto modificado
+    socket.on('productoModificado', (producto) => {
         const itemToUpdate = productList.querySelector(`li[data-id="${producto._id}"]`);
         if (itemToUpdate) {
-            itemToUpdate.innerHTML = `
-                <span class="product-code-io">${producto.code}</span><br> 
-                <span class="product-category-io">${producto.category}</span> - 
-                <span class="product-title-io">${producto.title}</span><br>
-                <span class="product-description-io">${producto.description}</span><br> 
-                Precio: $<span class="product-price-io">${producto.price}</span> - 
-                Stock: <span class="product-stock-io">${producto.stock}</span>
-                <div class="dropdown">
-                    <button class="dropdown-btn">Opciones</button>
-                    <div class="dropdown-menu">
-                        <a href="#" class="edit-btn" data-id="${producto._id}">Modificar</a>
-                        <a href="#" class="delete-btn" data-id="${producto._id}">Eliminar</a>
-                        <a href="#" class="add-cart-btn" data-id="${producto._id}">Agregar al Carrito</a>
-                    </div>
-                </div>
-            `;
+            itemToUpdate.querySelector('.product-code-io').textContent = producto.code;
+            itemToUpdate.querySelector('.product-category-io').textContent = producto.category;
+            itemToUpdate.querySelector('.product-title-io').textContent = producto.title;
+            itemToUpdate.querySelector('.product-description-io').textContent = producto.description;
+            itemToUpdate.querySelector('.product-price-io').textContent = producto.price;
+            itemToUpdate.querySelector('.product-stock-io').textContent = producto.stock;
         }
     });
-
 });

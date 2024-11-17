@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Productos Paginados</title>
-    <link rel="stylesheet" href="/path/to/styles.css">
+    <link rel="stylesheet" href="/estilos/estilos.css">
 </head>
 <body>
     <h1>Productos Paginados</h1>
@@ -23,9 +23,13 @@
                 <div class="dropdown">
                     <button class="dropdown-btn">Opciones</button>
                     <div class="dropdown-menu">
-                        <a href="#" class="edit-btn" data-id="{{this._id}}">Modificar</a>
-                        <a href="#" class="delete-btn" data-id="{{this._id}}">Eliminar</a>
-                        <a href="#" class="add-cart-btn" data-id="{{this._id}}">Agregar al Carrito</a>
+                        {{#if (eq userRol 'admin')}}
+                            <a href="#" class="edit-btn" data-id="{{this._id}}">Modificar</a>
+                            <a href="#" class="delete-btn" data-id="{{this._id}}">Eliminar</a>
+                        {{/if}}
+                        {{#if (eq userRol 'user')}}
+                            <a href="#" class="add-cart-btn" data-id="{{this._id}}">Agregar al Carrito</a>
+                        {{/if}}
                     </div>
                 </div>
             </li>
@@ -59,7 +63,9 @@
 
     <!-- Botón para agregar producto y volver al menú -->
     <div class="container">
-        <button id="openAddProductModal" class="add-btn">Agregar Producto</button>
+        {{#if (eq userRol 'admin')}}
+            <button id="openAddProductModal" class="add-btn">Agregar Producto</button>
+        {{/if}}
         <button id="irAlMenu" class="irAlMenu">Volver al Menú</button>
     </div>
 
@@ -110,7 +116,9 @@
         </div>
     </div>
 
+    <script> const userRol = "{{userRole}}"</script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/scripts/productsPaginated.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.min.js"></script>
 </body>
 </html>

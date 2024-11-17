@@ -6,12 +6,12 @@ export const auth=rol=>{
     return (req, res, next)=>{
         if(!req.user || !req.user?.rol) {
             res.setHeader('Content-Type','application/json');
-            return res.status(403).json({error:`Sin autorización `})
+            return res.status(403).json({error:`Sin autorización.`})
         }
 
         if(req.user.rol!==rol){
             res.setHeader('Content-Type','application/json');
-            return res.status(403).json({error:`Sin autorización `})
+            return res.status(403).json({error:`Sin autorización para acceder.`})
         }
         next()
     }

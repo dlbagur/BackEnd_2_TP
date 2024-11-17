@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             
             if (e.target.classList.contains('add-cart-btn')) {
-                let cart = "66e62eb3a973a75814533678";
+                const cartId = req.cookies.cartId;
                 let idProducto = e.target.getAttribute('data-id');
                 socket.emit('agregarProductoAlCart', { cart: cart, idProducto: idProducto });
             }

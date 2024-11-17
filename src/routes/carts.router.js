@@ -5,18 +5,6 @@ import { io } from '../app.js';
 
 const router = Router();
 
-// router.get('/', async (req, res) => {
-//     try {
-//         let carts = await CartsManager.getCarts();
-//         if (!carts || carts.length === 0) {
-//             return res.status(400).json({ error: `No existen carritos para mostrar` });
-//         }
-//         res.render('realTimeCarts', { carts });
-//     } catch (error) {
-//         res.status(500).json({ error: `Error inesperado en el servidor: ${error.message}` });
-//     }
-// });
-
 router.get('/', async (req, res) => {
     try {
         const cartId = req.cookies.cartId;
@@ -35,6 +23,7 @@ router.get('/', async (req, res) => {
 
 router.get('/:cid', async (req, res) => {
     let { cid } = req.params;
+    console.log("req.param en :cid: ", req.params)
     if (!isValidObjectId(cid)) {
         return res.status(400).json({ error: `ID con formato inválido` });
     }
@@ -44,6 +33,51 @@ router.get('/:cid', async (req, res) => {
             return res.status(400).json({ error: `No existe el carrito con ID ${cid}` });
         } else {
             res.render('realTimeCarts', {cart} )};
+    } catch (error) {
+        res.status(500).json({ error: `Error inesperado en el servidor: ${error.message}` });
+    }
+});
+
+router.get('/:cid/purchase', async (req, res) => {
+    let { cid } = req.params;
+    console.log("req.param en purchase: ", req.params);
+    if (!isValidObjectId(cid)) {
+        return res.status(400).json({ error: `ID de carrito con formato inválido` });
+    }
+    try {
+        let cart = await CartsManager.getCartById(cid);
+        if (!cart) {
+            return res.status(404).json({ error: `No existe el carrito con ID ${cid}` });
+        }
+
+        let { compra, sinStock } = await CartsManager.purchase(cid);
+        return res.status(200).json({
+            message: `Compra efectuada`,
+            compra,
+            sinStock,
+        });
+    } catch (error) {
+        console.error("Error en purchase: ", error);
+        res.status(500).json({
+            error: `Error inesperado en el servidor: ${error.message}`,
+        });
+    }
+});
+
+
+router.get('/purchase', async (req, res) => {
+    let { cid } = req.params;
+    console.log("req.param en purchase: ", req.params)
+    if (!cid) {
+        return res.status(400).json({ error: `No existe el ID del carrito` });
+    }
+    try {
+        let cart = await CartsManager.getCartById(cid);
+        if (!cart) {
+            return res.status(400).json({ error: `No existe el carrito con ID ${cid}` });
+        }
+        let { compra, sinStock } = await CartsManager.purchase(cid);
+        return res.status(200).json({ message: `Compra efectuada`, compra, sinStock });
     } catch (error) {
         res.status(500).json({ error: `Error inesperado en el servidor: ${error.message}` });
     }
@@ -77,6 +111,7 @@ router.post('/:cid/products/:pid', async (req, res) => {
 
 router.delete('/:cid/', async (req, res) => {
     let { cid } = req.params;
+    console.log("req.param en :cid/: ", req.params)
     if (!isValidObjectId(cid)) {
         return res.status(400).json({ error: `ID con formato inválido` });
     }
@@ -111,23 +146,6 @@ router.delete('/:cid/products/:pid', async (req, res) => {
         return res.status(200).json({ message: `Producto eliminado del carrito`, cart: updatedCart });
     } catch (error) {
         res.status(500).json({ error: `Error: ${error.message}` });
-    }
-});
-
-router.post('/:cid/purchase', async (req, res) => {
-    let { cid } = req.params;
-    if (!isValidObjectId(cid)) {
-        return res.status(400).json({ error: `ID con formato inválido` });
-    }
-    try {
-        let cart = await CartsManager.getCartById(cid);
-        if (!cart) {
-            return res.status(400).json({ error: `No existe el carrito con ID ${cid}` });
-        }
-        let { compra, sinStock } = await CartsManager.purchaseCart(cid);
-        return res.status(200).json({ message: `Compra efectuada`, compra, sinStock });
-    } catch (error) {
-        res.status(500).json({ error: `Error inesperado en el servidor: ${error.message}` });
     }
 });
 

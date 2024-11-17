@@ -6,9 +6,18 @@ import { auth } from '../middleware/auth.js';
 
 const router = Router();
 
-router.get('/',(req,res)=>{
-    res.status(200).render('home')
-})
+// router.get('/',(req,res)=>{
+//     res.status(200).render('home')
+// })
+
+router.get('/', async (req, res) => {
+    try {
+        const cartId = req.cookies.cartId || req.user?.cart || null;
+        res.render('home', { cartId });
+    } catch (error) {
+        res.status(500).json({ error: `Error inesperado en el servidor: ${error.message}` });
+    }
+});
 
 router.get('/login', async (req, res) => {
     try {

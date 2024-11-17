@@ -1,5 +1,6 @@
 import express from 'express';
 import { engine } from 'express-handlebars';
+import Handlebars from 'handlebars';
 import { Server } from 'socket.io';
 import { config } from "./config/config,js";
 import { connDB } from './ConnDb.js';
@@ -30,9 +31,9 @@ const serverHTTP = app.listen(PORT, () => {
 
 const io = new Server(serverHTTP);
 
-
 // Configuración de Handlebars
-app.engine('handlebars', engine());
+Handlebars.registerHelper('eq', (a, b) => a === b);
+app.engine('handlebars', engine({ handlebars: Handlebars }));
 app.set('view engine', 'handlebars');
 app.set('views', './src/views');
 
