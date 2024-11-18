@@ -10,7 +10,7 @@
     <h1>Productos Paginados</h1>
     <ul id="product-list">
         {{#each products}}
-            <li class="product-item card-io">
+            <li class="product-item card-io" data-id={{this._id}}>
                 <span class="product-code">{{this.code}}</span>
                 <br>
                 <span class="product-category">{{this.category}}</span> - 

@@ -79,6 +79,16 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on('validarProductoP', async (code) => {
+        try {
+            const existe = await productsManager.getProductBy({ code });
+            socket.emit('productoExisteP', !!existe);
+        } catch (error) {
+            console.error('Error al validar el producto:', error);
+            socket.emit('productoExisteP', false);
+        }
+    });
+
     socket.on('crearProducto', async (producto) => {
         try {
             const nuevoProducto = await productsManager.addproduct(producto);            
@@ -101,6 +111,25 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on('eliminarProducto', async (idProducto) => {
+        try {
+            await productsManager.deleteproduct(idProducto);
+            io.emit('eliminarProducto', idProducto);
+        } catch (error) {
+            socket.emit('error', 'Error al eliminar producto');
+        }
+    });
+
+    socket.on('crearProductoP', async (producto) => {
+        try {
+            const nuevoProducto = await productsManager.addproduct(producto);            
+            io.emit('agregarProductoP', nuevoProducto);
+        } catch (error) {
+            console.log("Error ", error)
+            socket.emit('error', 'Error al agregar producto');
+        }
+    });
+
     socket.on('modificarProductoP', async (producto) => {
         try {
             const { _id, ...dataToUpdate } = producto;
@@ -110,13 +139,13 @@ io.on('connection', (socket) => {
             console.log("Error ", error)
             socket.emit('error', 'Error al modificar producto');
         }
-    });
 
-    socket.on('eliminarProducto', async (idProducto) => {
+    });    
+    
+    socket.on('eliminarProductoP', async (idProducto) => {
         try {
             await productsManager.deleteproduct(idProducto);
-            console.log("Eliminar producto:" , idProducto)
-            io.emit('eliminarProducto', idProducto);
+            io.emit('eliminarProductoP', idProducto);
         } catch (error) {
             socket.emit('error', 'Error al eliminar producto');
         }
@@ -138,6 +167,16 @@ io.on('connection', (socket) => {
             io.emit('CarritoActualizado', cart);
         } catch (error) {
             socket.emit('productoAgregado', { success: false, message: error.message });
+        }
+    });
+
+    socket.on('agregarProductoAlCartP', async ({ cart, idProducto }) => {
+        try {
+            await CartsManager.addProductToCart(cart, idProducto);
+            socket.emit('productoAgregadoP', { success: true, message: 'Producto agregado al carrito' });
+            io.emit('CarritoActualizadoP', cart);
+        } catch (error) {
+            socket.emit('productoAgregadoP', { success: false, message: error.message });
         }
     });
 
