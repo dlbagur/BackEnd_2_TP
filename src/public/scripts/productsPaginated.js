@@ -166,13 +166,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             socket.off('productoAgregadoP');
-            socket.on('productoAgregadoP', (data) => {
-                if (data.success) {
-                    alert(data.message);
+            socket.on('productoAgregadoP', (success, message) => {
+                if (success) {
+                    alert("Se agregó el producto al carrito.");
                 } else {
-                    alert(`Error: ${data.message}`);
+                    console.log("no hay stock u otro error");
+                    alert(`Error: ${message}`);
                 }
             });
+
             if (e.target.classList.contains('add-cart-btn')) {
                 const cartId = localStorage.getItem('cartId');
                 let idProducto = e.target.getAttribute('data-id');

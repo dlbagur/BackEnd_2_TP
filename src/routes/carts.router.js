@@ -50,7 +50,7 @@ router.get('/:cid/purchase', async (req, res) => {
             return res.status(404).json({ error: `No existe el carrito con ID ${cid}` });
         }
 
-        let { compra, sinStock } = await CartsManager.purchase(cid);
+        let { compra, sinStock } = await CartsManager.purchaseCart(cid);
         return res.status(200).json({
             message: `Compra efectuada`,
             compra,
@@ -76,7 +76,7 @@ router.get('/purchase', async (req, res) => {
         if (!cart) {
             return res.status(400).json({ error: `No existe el carrito con ID ${cid}` });
         }
-        let { compra, sinStock } = await CartsManager.purchase(cid);
+        let { compra, sinStock } = await CartsManager.purchaseCart(cid);
         return res.status(200).json({ message: `Compra efectuada`, compra, sinStock });
     } catch (error) {
         res.status(500).json({ error: `Error inesperado en el servidor: ${error.message}` });

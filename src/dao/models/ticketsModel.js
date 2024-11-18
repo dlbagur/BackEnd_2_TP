@@ -6,9 +6,9 @@ const ticketsColl = "tickets";
 const ticketsSchema = new mongoose.Schema(
     {
         code: { type: String, unique: true, default: () => uuidv4() },
-        purchase_datetime: {type: Date, default: Date.now},
-        amount: Number,
-        purchaser: String
+        purchase_datetime: { type: Date},
+        amount: { type: Number, required: true },
+        purchaser: { type: String, required: true }
     },
     {
         timestamps: true,

@@ -102,7 +102,7 @@ class CartsManager {
         return cart;
     }
 
-    static async purchase(cartId) {
+    static async purchaseCart(cartId) {
         let cart;
         let compra = [];
         let sinStock = [];
@@ -128,7 +128,7 @@ class CartsManager {
                     cart.productos[i].comprado = true;
                     await productoStock.save();
                 } else {
-                    sinStock.push(prodId.toString());
+                    sinStock.push(productoStock);
                     cart.productos[i].comprado = false;
                 }
             } catch (error) {
@@ -142,7 +142,7 @@ class CartsManager {
             const ticket = await ticketsModelo.create({
                 purchaser: cart.usuario,
                 amount: total,
-                purchase_datetime: Date.now
+                purchase_datetime: Date.now()
             });
             console.log('Ticket generado:', ticket);
         }
