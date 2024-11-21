@@ -175,6 +175,27 @@ background-color: #0056b3;
   display: block; 
 }
 
+/* Dropdown Menú de los Carts */
+.dropdown-menu-c {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-menu-c a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-menu-c a:hover {
+  background-color: #f1f1f1;
+}
+
 
 /* Estilos para modales */
 .modal {

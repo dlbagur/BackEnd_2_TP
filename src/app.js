@@ -157,7 +157,7 @@ io.on('connection', (socket) => {
             await CartsManager.deleteAllProductsFromCart(idCarrito);
             io.emit('vaciarCarritoR', idCarrito);
         } catch (error) {
-            socket.emit('error', 'Error al eliminar carrito');
+            socket.emit('error', 'Error al eliminar el contenido del carrito');
         }
     });
 
