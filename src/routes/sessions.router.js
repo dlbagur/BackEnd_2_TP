@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { UsuariosManager } from "../dao/UsuariosManager.js";
+import { UsuariosManager } from "../DAO/usuariosMongoDAO.js";
 import { generaHash, validaHash } from "../utils.js";
-import { config } from "../config/config,js";
+import { config } from "../config/config.js";
 import { auth } from '../middleware/auth.js';
 import passport from 'passport';
 import { passportCall } from "../utils.js";

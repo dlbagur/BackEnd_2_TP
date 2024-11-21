@@ -2,12 +2,12 @@ import express from 'express';
 import { engine } from 'express-handlebars';
 import Handlebars from 'handlebars';
 import { Server } from 'socket.io';
-import { config } from "./config/config,js";
-import { connDB } from './ConnDb.js';
+import { config } from "./config/config.js";
+import { connDB } from './ConnDB.js';
 import productsRouter from './routes/products.router.js';
-import productsManager from "./dao/ProductsManager.js"
+import productsManager from "./DAO/productsMongoDAO.js"
 import cartsRouter from './routes/carts.router.js';
-import CartsManager from './dao/CartsManager.js';
+import CartsManager from './DAO/cartsMongoDAO.js';
 import { router as vistasRouter } from './routes/vistas.routers.js';
 import { router as sessionsRouter } from './routes/sessions.router.js';
 import cookieParser from 'cookie-parser';
@@ -17,8 +17,9 @@ import sessions from 'express-session';
 import passport from "passport";
 import { initPassport } from './config/passport.config.js';
 import { passportCall } from './utils.js';
-import FileStore from "session-file-store";
 import MongoStore from "connect-mongo";
+import FileStore from "session-file-store";
+
 
 const PORT=config.PORT;
 const app=express();
@@ -154,7 +155,7 @@ io.on('connection', (socket) => {
     socket.on('vaciarCarrito', async (idCarrito) => {
         try {
             await CartsManager.deleteAllProductsFromCart(idCarrito);
-            io.emit('vaciarCarrito', idCarrito);
+            io.emit('vaciarCarritoR', idCarrito);
         } catch (error) {
             socket.emit('error', 'Error al eliminar carrito');
         }
@@ -201,6 +202,6 @@ io.on('connection', (socket) => {
     });
 });
 
-connDB()
+connDB.conectar(config.MONGO_URL, config.DB_NAME)
 
 export { io };

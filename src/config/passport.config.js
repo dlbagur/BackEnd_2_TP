@@ -6,11 +6,11 @@
 import passport from "passport";
 import passportJWT from "passport-jwt"
 import local from "passport-local"
-import { UsuariosManager } from "../dao/UsuariosManager.js";
+import { UsuariosManager } from "../DAO/usuariosMongoDAO.js";
 import github from "passport-github2"
 import { generaHash, validaHash } from "../utils.js";
-import { config } from "../config/config,js";
-import { cartsModelo } from '../dao/models/cartsModel.js'
+import { config } from "./config.js";
+import { cartsModelo } from '../DAO/models/cartsModel.js'
 
 const buscarToken=req=>{
     let token=null

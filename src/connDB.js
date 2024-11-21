@@ -1,14 +1,17 @@
 import mongoose from "mongoose";
-import { config } from "./config/config,js";
 
-export const connDB=async()=>{
-    try {
-        await mongoose.connect(
-            config.MONGO_URL,
-            {dbName:config.DB_NAME}
-        )
-        console.log("DB Conectada!")
-    } catch (error) {
-            console.log(`Error al conectar a DB:  ${error.message}`)
+export class connDB{
+    static #instancia=null
+
+    constructor(url, db){
+        mongoose.connect(url, {dbName: db})
+    }
+
+    static conectar(url, db){
+        if(!this.#instancia){
+            this.#instancia=new connDB(url, db)
+            console.log(`DB Online`)
         }
+        return this.#instancia
+    }
 }

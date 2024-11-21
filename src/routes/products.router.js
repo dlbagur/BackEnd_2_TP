@@ -1,5 +1,5 @@
 import { Router } from "express";
-import productsManager from "../dao/ProductsManager.js"
+import productsManager from "../DAO/productsMongoDAO.js"
 import { error } from "console"
 import { isValidObjectId } from "mongoose";
 import { io } from '../app.js';

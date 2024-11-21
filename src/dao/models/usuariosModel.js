@@ -6,6 +6,7 @@ export const usuariosModel=mongoose.model(
         {
             nombre: String,
             apellido: String,
+            nombreCompleto : String,
             email: {type: String, unique: true},
             age: Number,
             password: String,

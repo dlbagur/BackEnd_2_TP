@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = "/"
         });
     }
-    socket.on('vaciarCarrito', (idCarrito) => {
+    socket.on('vaciarCarritoR', (idCarrito) => {
         const cartsList = document.getElementById('carts-list');
         const itemToRemove = cartsList.querySelector(`li[data-id="${idCarrito}"]`);
     });
