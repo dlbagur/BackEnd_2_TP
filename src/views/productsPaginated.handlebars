@@ -13,6 +13,8 @@
             <li class="product-item card-io" data-id={{this._id}}>
                 <span class="product-code">{{this.code}}</span>
                 <br>
+                id: <span class="product-id">{{this._id}}</span>
+                <br>
                 <span class="product-category">{{this.category}}</span> - 
                 <span class="product-title">{{this.title}}</span>
                 <br>
@@ -23,11 +25,11 @@
                 <div class="dropdown">
                     <button class="dropdown-btn">Opciones</button>
                     <div class="dropdown-menu">
-                        {{#if (eq userRol 'admin')}}
+                        {{#if (eq userRole 'admin')}}
                             <a href="#" class="edit-btn" data-id="{{this._id}}">Modificar</a>
                             <a href="#" class="delete-btn" data-id="{{this._id}}">Eliminar</a>
                         {{/if}}
-                        {{#if (eq userRol 'user')}}
+                        {{#if (eq userRole 'user')}}
                             <a href="#" class="add-cart-btn" data-id="{{this._id}}">Agregar al Carrito</a>
                         {{/if}}
                     </div>
@@ -63,7 +65,7 @@
 
     <!-- Botón para agregar producto y volver al menú -->
     <div class="container">
-        {{#if (eq userRol 'admin')}}
+        {{#if (eq userRole 'admin')}}
             <button id="openAddProductModal" class="add-btn">Agregar Producto</button>
         {{/if}}
         <button id="irAlMenu" class="irAlMenu">Volver al Menú</button>
@@ -116,7 +118,7 @@
         </div>
     </div>
 
-    <script> const userRol = "{{userRole}}"</script>
+    <script> const userRole = "{{userRole}}"</script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/scripts/productsPaginated.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.min.js"></script>

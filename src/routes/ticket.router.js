@@ -32,7 +32,7 @@ router.post('/', async (req, res) => {
         if (!cart) {
             return res.status(400).json({ error: `No existe el carrito con ID ${cid}` });
         }
-        let { compra, sinStock } = await CartsManager.purchaseCart(cid);
+        let { compra, sinStock } = await CartsManager.purchase(cid);
         return res.status(200).json({ message: `Compra efectuada`, compra, sinStock });
     } catch (error) {
         res.status(500).json({ error: `Error inesperado en el servidor: ${error.message}` });

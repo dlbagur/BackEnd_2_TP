@@ -1,32 +1,33 @@
-const inputNombre=document.getElementById("nombre");
-const inputApellido=document.getElementById("apellido");
+const inputNombre=document.getElementById("first_name");
+const inputApellido=document.getElementById("last_name");
 const inputEmail=document.getElementById("email");
-const inputEdad=document.getElementById("edad");
+const inputEdad=document.getElementById("age");
 const inputPassword=document.getElementById("password");
-const inputRol=document.getElementById("rol");
+const inputRol=document.getElementById("role");
 const btnSubmit=document.getElementById("btnSubmit");
 const divMensajes=document.getElementById("mensajes");
 
 
 btnSubmit.addEventListener("click", async (e)=>{
     e.preventDefault()
-    let nombre=inputNombre.value;
-    let apellido=inputApellido.value;
+    let first_name=inputNombre.value;
+    let last_name=inputApellido.value;
     let email=inputEmail.value;
-    let edad=inputEdad.value;
+    let age=inputEdad.value;
     let password=inputPassword.value;
     let cart="";
-    let rol=inputRol.value;
-    if(!nombre || !apellido || !email || !password){
-        alert("Complete los datos")
+    let role=inputRol.value;
+    // if(!first_name || !last_name || !email || !password){
+    if(!first_name || !email || !role || !password){
+        alert("Complete los datos, Nombre, Apelildo, email, Password y Rol son obligatorios")
         return
     }
-    if(edad<18){
-        alert("Debe ser mayor de edad para registrarse en este sitio")
-        return
-    }
+    // if(age<18){
+    //     alert("Debe ser mayor de edad para registrarse en este sitio")
+    //     return
+    // }
 
-    let body= {nombre, apellido, email, password, edad, rol}
+    let body= {first_name, last_name, email, password, age, role}
 
     try {
         let respuesta = await fetch("/api/sessions/registro", {

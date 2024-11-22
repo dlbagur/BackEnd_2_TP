@@ -30,14 +30,15 @@ export const initPassport = () => {
             },
             async (req, username, password, done) => {
                 try {
-                    const { nombre, apellido, email, edad, rol } = req.body;
+                    const { first_name, last_name, email, age, role } = req.body;
 
-                    if (!nombre || !apellido || !edad || !rol) {
-                        return done(null, false, { message: "Todos los campos son obligatorios" });
+                    // if (!first_name || !last_name || !age || !role) {
+                    if (!first_name || !email || !role) {
+                            return done(null, false, { message: "Los campos first_name, email role y password son obligatorios" });
                     }
-                    if (isNaN(edad) || edad < 18) {
-                        return done(null, false, { message: "Debes ser mayor de edad para registrarte" });
-                    }
+                    // if (isNaN(age) || age < 18) {
+                    //     return done(null, false, { message: "Debes ser mayor de edad para registrarte" });
+                    // }
 
                     let existe = await UsuariosManager.getUserBy({ email:username});
                     if (existe) {
@@ -54,12 +55,12 @@ export const initPassport = () => {
                     const passwordHash = generaHash(password);
 
                     const nuevoUsuario = await UsuariosManager.createUser({
-                        nombre,
-                        apellido,
+                        first_name,
+                        last_name,
                         email: username,
                         password: passwordHash,
-                        edad,
-                        rol,
+                        age,
+                        role,
                         cart: carrito._id
                     });
 

@@ -8,7 +8,23 @@ const ticketsSchema = new mongoose.Schema(
         code: { type: String, unique: true, default: () => uuidv4() },
         purchase_datetime: { type: Date},
         amount: { type: Number, required: true },
-        purchaser: { type: String, required: true }
+        purchaser: { type: String, required: true },
+        products: [
+            {
+                product: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "products"
+                },
+                quantity: {
+                    type: Number,
+                    default: 1
+                },
+                price:  {
+                    type: Number,
+                    default: 1
+                }
+            }        
+        ],
     },
     {
         timestamps: true,

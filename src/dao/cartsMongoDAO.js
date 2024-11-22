@@ -102,7 +102,7 @@ class CartsManager {
         return cart;
     }
 
-    static async purchaseCart(cartId) {
+    static async purchase(cartId) {
         let cart;
         let compra = [];
         let sinStock = [];
@@ -123,12 +123,16 @@ class CartsManager {
                     throw new Error(`No existe producto con el ID ${prodId}`);
                 }
                 if (productoStock.stock >= cart.productos[i].quantity) {
-                    compra.push(cart.productos[i]);
+                    compra.push({
+                        producto: productoStock._id,
+                        price: productoStock.price,
+                        quantity: cart.productos[i].quantity
+                    });
                     productoStock.stock -= cart.productos[i].quantity;
                     cart.productos[i].comprado = true;
                     await productoStock.save();
                 } else {
-                    sinStock.push(productoStock);
+                    sinStock.push(productoStock._id);
                     cart.productos[i].comprado = false;
                 }
             } catch (error) {
@@ -138,11 +142,20 @@ class CartsManager {
     
         // Genero un ticket si hubo productos comprados
         if (compra.length > 0) {
-            const total = compra.reduce((sum, item) => sum + item.quantity * item.producto.price, 0);
+            const total = compra.reduce((sum, item) => sum + item.quantity * item.price, 0);
+    
+            // Formateo los productos para la tabla Ticket
+            const formattedProducts = compra.map(item => ({
+                product: item.producto,
+                price: item.price,
+                quantity: item.quantity
+            }));
+    
             const ticket = await ticketsModelo.create({
                 purchaser: cart.usuario,
                 amount: total,
-                purchase_datetime: Date.now()
+                purchase_datetime: new Date(),
+                products: formattedProducts
             });
             console.log('Ticket generado:', ticket);
         }

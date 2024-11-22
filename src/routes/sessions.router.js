@@ -21,7 +21,7 @@ router.post("/registro",
         console.log("Usuario registrado:", req.user);
         res.setHeader('Content-Type','application/json');
         return res.status(201).json({
-            message: `Registro exitoso para ${req.user.nombre}`,
+            message: `Registro exitoso para ${req.user.first_name}`,
             usuario: req.user
         });
 
@@ -33,15 +33,15 @@ router.post("/login",
     (req, res)=>{
         const userPayload = {
             id: req.user._id,
-            nombre: req.user.nombre,
+            first_name: req.user.first_name,
             email: req.user.email,
-            rol: req.user.rol,
+            role: req.user.role,
         };
         let token=jwt.sign(req.user, config.SECRET, {expiresIn: 3600})
         res.cookie("tokenCookie", token, {httpOnly:true});
         res.cookie('cartId', req.user.cart, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
         res.setHeader('Content-Type','application/json');
-        return res.status(201).json({payload:`Login exitoso para ${req.user.nombre}`, usuarioLogueado:req.user, cart: req.user.cart});
+        return res.status(201).json({payload:`Login exitoso para ${req.user.first_name}`, usuarioLogueado:req.user, cart: req.user.cart});
     }
 )
 

@@ -32,18 +32,18 @@ router.get("/", async (req, res) => {
 
   try {
     const products = await productsManager.getproductsPaginate(skip, limit, page, sortOptions, filters);
-    const userRol = req.user?.rol || "guest";
+    const userRole = req.user?.role || "guest";
     const productsWithRoles = products.docs.map(product => ({
       ...product,
-      userRol: req.user?.rol || "guest",
-      userIsAdmin: req.user?.rol === "admin",
-      userIsUser: req.user?.rol === "user"
+      userRole: req.user?.role || "guest",
+      userIsAdmin: req.user?.role === "admin",
+      userIsUser: req.user?.role === "user"
   }));
     res.render("productsPaginated", {
       products: productsWithRoles,
-      userRol: req.user?.rol || "guest",
-      userIsAdmin: req.user?.rol === "admin",
-      userIsUser: req.user?.rol === "user",   
+      userRole: req.user?.role || "guest",
+      userIsAdmin: req.user?.role === "admin",
+      userIsUser: req.user?.role === "user",   
       page: products.page,
       totalPages: products.totalPages,
       hasNextPage: products.hasNextPage,

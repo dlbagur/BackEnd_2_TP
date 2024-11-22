@@ -41,7 +41,7 @@ btnSubmit.addEventListener("click", async (e) => {
         return;
     } else {
         let datos = await respuesta.json();
-        console.log(datos);
+        console.log("datos: ", datos);
         localStorage.setItem('cartId', datos.cart);
         document.cookie = `cartId=${datos.cart}; path=/`;
         alert(datos.payload);

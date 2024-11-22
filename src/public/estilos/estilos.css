@@ -11,13 +11,20 @@ margin-top: 20px;
 margin-bottom: 10px;
 }
 
+.product-id-io {
+  color: gray;
+  list-style-type: none;
+  text-align: left;
+  font-size: 1em;
+  margin-bottom: 5px;
+  }
+  
 .product-category,
 .product-title {
 color: darkblue;
 list-style-type: none;
 text-align: left;
 font-size: 1em;
-/* font-weight: bold; */
 margin-bottom: 5px;
 }
 
@@ -39,6 +46,16 @@ font-weight: bold;
 color: brown;
 margin-top: 20px;
 margin-bottom: 10px;
+}
+
+.product-id-io {
+font-size: 15px;
+color: gray;
+list-style-type: none;
+text-align: left;
+font-size: 1em;
+font-weight: bold;
+margin-bottom: 5px;
 }
 
 .product-category-io,

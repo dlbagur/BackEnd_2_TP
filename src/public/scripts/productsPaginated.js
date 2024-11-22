@@ -59,6 +59,8 @@ document.addEventListener('DOMContentLoaded', () => {
             productItem.innerHTML = `
                 <span class="product-code-io">${producto.code}</span>
                 <br> 
+                <span class="product-id-io">${producto._id}</span>
+                <br> 
                 <span class="product-category-io">${producto.category}</span> - 
                 <span class="product-title-io">${producto.title}</span>
                 <br>
@@ -230,6 +232,8 @@ document.addEventListener('DOMContentLoaded', () => {
         productItem.setAttribute('data-id', producto._id);
         productItem.innerHTML = `
             <span class="product-code-io">${producto.code}</span>
+            <br> 
+            <span class="product-id-io">${producto._id}</span>
             <br> 
             <span class="product-category-io">${producto.category}</span> - 
             <span class="product-title-io">${producto.title}</span>

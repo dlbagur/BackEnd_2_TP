@@ -1,8 +1,8 @@
 import { UsuariosDTO } from "./UsuariosDTO.js"
 
 let dataFromBody = {
-        nombre:"Juan", 
-        apellido:"Fernandez",
+        first_name:"Juan", 
+        last_name:"Fernandez",
         email:"jfernandez@test.com"
    
 }
