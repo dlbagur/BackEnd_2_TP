@@ -1,6 +1,6 @@
 import { productosModelo } from "./models/productsModel.js";
 
-class ProductsManager {
+class ProductsMongoDAO {
 
     static async getproducts() {
           return await productosModelo.find().lean()
@@ -15,9 +15,9 @@ class ProductsManager {
           offset: skip
         };
         return await productosModelo.paginate(filters, options);
-      }
+    }
 
-      static async getProductById(filtro={}){
+    static async getProductById(filtro={}){
         return await productosModelo.findById(filtro).lean()
     }
 
@@ -47,4 +47,4 @@ class ProductsManager {
     }
 }
 
-export default ProductsManager;
+export default ProductsMongoDAO;

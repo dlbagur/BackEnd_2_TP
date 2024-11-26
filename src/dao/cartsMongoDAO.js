@@ -3,7 +3,7 @@ import { cartsModelo } from './models/cartsModel.js';
 import { productosModelo } from './models/productsModel.js';
 import { ticketsModelo } from './models/ticketsModel.js';
 
-class CartsManager {
+class CartsMongoDAO {
 
     static async getCarts() {
         return await cartsModelo.find()
@@ -169,4 +169,4 @@ class CartsManager {
     
 }
 
-export default CartsManager;
+export default CartsMongoDAO;

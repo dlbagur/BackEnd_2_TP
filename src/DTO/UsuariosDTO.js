@@ -1,4 +1,4 @@
-export class UsuariosDTO{
+export default class UsuariosDTO{
     constructor(usuario){
         this.first_name = usuario.first_name.toUpperCase()
         this.last_name = usuario.last_name.toUpperCase()

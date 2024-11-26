@@ -38,7 +38,7 @@ app.engine('handlebars', engine({ handlebars: Handlebars }));
 app.set('view engine', 'handlebars');
 app.set('views', './src/views');
 
-// Middleware
+// Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('./src/public'));
@@ -62,7 +62,6 @@ app.use(passport.initialize())
 
 // Rutas
 app.use('/', vistasRouter);
-
 app.use('/api/products', passportCall("current"), auth2(["user", "admin"]), productsRouter);
 app.use('/api/carts', passportCall("current"), auth("user"), cartsRouter);
 app.use('/api/sessions', sessionsRouter);
