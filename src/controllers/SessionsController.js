@@ -22,12 +22,12 @@ export class SessionsController {
             role: req.user.role,
         };
         let token=jwt.sign(req.user, config.SECRET, {expiresIn: 3600})
+        const userDTO = new UsuariosDTO(req.user); 
         res.cookie("tokenCookie", token, {httpOnly:true});
         res.cookie('cartId', req.user.cart, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
         res.setHeader('Content-Type','application/json');
-        return res.status(201).json({payload:`Login exitoso para ${req.user.first_name}`, usuarioLogueado:req.user, cart: req.user.cart});
+        return res.status(201).json({payload:`Login exitoso para ${req.user.first_name}`, usuarioLogueado:userDTO, cart: req.user.cart});
     }
-
 
     static async logout (req, res) {
         req.session.destroy(error=>{

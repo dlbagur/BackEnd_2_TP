@@ -7,6 +7,7 @@ import passport from 'passport';
 import { passportCall } from "../utils.js";
 import jwt from "jsonwebtoken";
 import { SessionsController } from "../controllers/SessionsController.js";
+import UsuariosDTO from "../DTO/UsuariosDTO.js";
 
 export const router=Router()
 

@@ -11,6 +11,7 @@ import github from "passport-github2"
 import { generaHash, validaHash } from "../utils.js";
 import { config } from "./config.js";
 import { cartsModelo } from '../DAO/models/cartsModel.js'
+import UsuariosDTO from "../DTO/UsuariosDTO.js";
 
 const buscarToken=req=>{
     let token=null
