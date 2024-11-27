@@ -27,7 +27,7 @@ btnSubmit.addEventListener("click", async (e) => {
         password
     };
 
-    let respuesta = await fetch("/api/sessions/login", {
+    let respuesta = await fetch("/api/users/login", {
         method: "post",
         body: JSON.stringify(body),
         headers: {

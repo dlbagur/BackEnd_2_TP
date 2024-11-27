@@ -1,17 +1,19 @@
 import jwt from 'jsonwebtoken';
 import { config } from '../config/config.js';
 import UsuariosDTO from '../DTO/UsuariosDTO.js';
+import { usersService } from '../repository/Users.service.js';
 
-export class SessionsController {
+export class UsersController {
+
+    static async getUsers(req, res) {
+        let usuarios=await usersService.getUsers()
+        res.setHeader('Content-Type','application/json')
+        res.status(200).json({usuarios})
+    }
 
     static async registro(req, res) {
         res.setHeader('Content-Type', 'application/json');
         res.status(201).json({ message: "Registro exitoso", nuevoUsuario: req.user });
-    }
-
-    static async error(req, res) {
-        res.setHeader('Content-Type','application/json');
-        return res.status(401).json({error:`Error de autenticación.`})
     }
 
     static async login (req, res) {
@@ -30,22 +32,20 @@ export class SessionsController {
     }
 
     static async logout (req, res) {
-        req.session.destroy(error=>{
-        if(error){
-            res.setHeader('Content-Type','application/json');
-            return res.status(500).json({error:`Error al efectuar el logout`})
-        } else{
-            res.clearCookie('tokenCookie');
-            res.setHeader('Content-Type','application/json');
-            return res.status(200).json({
-                payload:"Logout exitoso. Esperamos verlo de nuevo por aca"});
-        }
-        })
+        res.clearCookie('tokenCookie');
+        res.setHeader('Content-Type','application/json');
+        return res.status(200).json({
+            payload:"Logout exitoso. Esperamos verlo de nuevo por aca"});
     }
 
     static async current (req, res) {
         res.setHeader('Content-Type', 'application/json');
         return res.status(200).json({ datosUsuarioLogueado: req.user });
+    }
+
+    static async error(req, res) {
+        res.setHeader('Content-Type','application/json');
+        return res.status(401).json({error:`Error de autenticación.`})
     }
 
 }

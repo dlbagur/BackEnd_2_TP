@@ -7,16 +7,25 @@ class CartsMongoDAO {
 
     static async getCarts() {
         return await cartsModelo.find()
-            .populate('productos.producto')
+            .populate({
+                path: 'productos.producto',
+                select: '-description -thumbnails'
+            })
             .lean();
     }
     
     static async getCartById(cartId) {
-        return await cartsModelo.findById(cartId)
-            .populate('productos.producto')
-            .lean();
+        try {
+            return await cartsModelo.findById(cartId)
+                .populate({
+                    path: 'productos.producto', 
+                    select: '-description -thumbnails'
+                });
+        } catch (error) {
+            throw new Error(`Error al obtener el carrito: ${error.message}`);
+        }
     }
-
+    
     static async addCart(cart = {}) {
         let nuevoCart = await cartsModelo.create(cart);
         return nuevoCart; 
@@ -143,8 +152,6 @@ class CartsMongoDAO {
         // Genero un ticket si hubo productos comprados
         if (compra.length > 0) {
             const total = compra.reduce((sum, item) => sum + item.quantity * item.price, 0);
-    
-            // Formateo los productos para la tabla Ticket
             const formattedProducts = compra.map(item => ({
                 product: item.producto,
                 price: item.price,
@@ -159,8 +166,6 @@ class CartsMongoDAO {
             });
             console.log('Ticket generado:', ticket);
         }
-    
-        // Actualizo el carrito con productos sin stock
         cart.productos = cart.productos.filter(p => sinStock.includes(p.producto._id.toString()));
         await cart.save();
     

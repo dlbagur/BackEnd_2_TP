@@ -9,7 +9,7 @@ import productsManager from "./DAO/productsMongoDAO.js"
 import cartsRouter from './routes/carts.router.js';
 import CartsManager from './DAO/cartsMongoDAO.js';
 import { router as vistasRouter } from './routes/vistas.routers.js';
-import { router as sessionsRouter } from './routes/sessions.router.js';
+import { router as sessionsRouter } from './routes/users.router.js';
 import cookieParser from 'cookie-parser';
 import cookiesRouter from './routes/cookies.router.js';
 import { auth, auth2 } from './middleware/auth.js';

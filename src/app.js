@@ -9,7 +9,7 @@ import productsManager from "./DAO/productsMongoDAO.js"
 import cartsRouter from './routes/carts.router.js';
 import CartsManager from './DAO/cartsMongoDAO.js';
 import { router as vistasRouter } from './routes/vistas.routers.js';
-import { router as sessionsRouter } from './routes/sessions.router.js';
+import { router as usersRouter } from './routes/users.router.js';
 import cookieParser from 'cookie-parser';
 import cookiesRouter from './routes/cookies.router.js';
 import { auth, auth2 } from './middleware/auth.js';
@@ -19,7 +19,6 @@ import { initPassport } from './config/passport.config.js';
 import { passportCall } from './utils.js';
 import MongoStore from "connect-mongo";
 import FileStore from "session-file-store";
-
 
 const PORT=config.PORT;
 const app=express();
@@ -43,18 +42,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('./src/public'));
 app.use(cookieParser());
-app.use(sessions({
-    secret: config.SECRET_SESSION,
-    resave: true,
-    saveUninitialized: true,
-    store: MongoStore.create(
-        {
-            mongoUrl: config.MONGO_URL,
-            dbName: config.DB_NAME,
-            ttl: 3600,
-        }
-    )
-}))
 
 // Passport
 initPassport()
@@ -62,9 +49,9 @@ app.use(passport.initialize())
 
 // Rutas
 app.use('/', vistasRouter);
-app.use('/api/products', passportCall("current"), auth2(["user", "admin"]), productsRouter);
-app.use('/api/carts', passportCall("current"), auth("user"), cartsRouter);
-app.use('/api/sessions', sessionsRouter);
+app.use('/api/products', productsRouter);
+app.use('/api/carts', cartsRouter);
+app.use('/api/users', usersRouter);
 
 io.on('connection', (socket) => {
     console.log('Nuevo cliente conectado');

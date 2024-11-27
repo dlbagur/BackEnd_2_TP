@@ -1,272 +1,162 @@
-import productsMongoDAO from "../DAO/productsMongoDAO.js"
+import productsMongoDAO from "../DAO/productsMongoDAO.js";
+import { isValidObjectId } from "mongoose";
 
-const categoriasValidas = ["Tintos", "Blancos", "Rosados", "Espumantes"];    
+const categoriasValidas = ["Tintos", "Blancos", "Rosados", "Espumantes"];
 
-export class ProductosController{
-    
+export class ProductosController {
     static getProducts = async (req, res) => {
-        let { limit, skip, sort, page, category, inStock } = req.query;
-        page = page ? Number(page) : 1;
-        limit = limit ? Number(limit) : 10;
-        if (!skip) {
-          skip = (page - 1) * limit;
-        } else {
-          skip = Number(skip);
-        }
-      
-        let sortOptions = {};
-        if (sort && (sort === 'asc' || sort === 'desc')) {
-            sortOptions = { price: sort };
-        }
-        const filters = {};
-        if (category) {
-            filters.category = category;
-        }
-        if (inStock === 'true') {
-          filters.stock = { $gt: 0 };
-        }
-      
         try {
-          const products = await productsMongoDAO.getproductsPaginate(skip, limit, page, sortOptions, filters);
-          const userRole = req.user?.role || "guest";
-          const productsWithRoles = products.docs.map(product => ({
-            ...product,
-            userRole: req.user?.role || "guest",
-            userIsAdmin: req.user?.role === "admin",
-            userIsUser: req.user?.role === "user"
-        }));
-          res.render("productsPaginated", {
-            products: productsWithRoles,
-            userRole: req.user?.role || "guest",
-            userIsAdmin: req.user?.role === "admin",
-            userIsUser: req.user?.role === "user",   
-            page: products.page,
-            totalPages: products.totalPages,
-            hasNextPage: products.hasNextPage,
-            hasPrevPage: products.hasPrevPage,
-            nextPage: products.nextPage,
-            prevPage: products.prevPage,
-            limit: limit,
-            sort: sort,
-            category: category,
-            inStock: inStock
-          });
-          } catch (error) {
-            res.setHeader("Content-Type", "application/json");
-            return res.status(500).json({
-                error: `Error inesperado en el servidor. Intente más tarde`,
-                detalle: `${error.message}`,
+            const products = await productsMongoDAO.getProducts();
+            res.status(200).json({ products });
+        } catch (error) {
+            res.status(500).json({
+                error: "Error inesperado en el servidor. Intente más tarde.",
+                detalle: error.message,
             });
-          }
-      };
+        }
+    };
 
-      static getProductsById = async (req, res) => {
-        let { id } = req.params
-        if(!isValidObjectId(id)){
-          res.setHeader('Content-Type','application/json');
-          return res.status(400).json({error:`id con format inválido`})
-        }
-        try {
-          let product = await productsMongoDAO.getProductById(id);
-          if(!product){
-              res.setHeader('Content-Type','application/json');
-              return res.status(400).json({error:`No existe un producto con id ${id}`})
-            } else {
-              return res.status(200).json({ product });
-            }
-          
-        } catch (error) {
-            res.setHeader("Content-Type", "applcation/json");
-          return res.status(500).json({
-            error: `Error inesperado en el servidor, Intente mas tarde`,
-            detalle: `${error.mensaje}`,
-          });
-        }
-      };
-      
-      static createProduct = async (req, res) => {
-        let {code, category, title, description, price, stock, status, thumbnails, ...otros} = req.body
-        if (!title || !description || !code || !price || !stock || !category) {
-          res.setHeader("Content-Type", "applcation/json");
-          return res.status(400).json({ 
-            error: 'Es obligatorio completar los campos title, description, code, price, stock y category' 
-          });
-        }
-        let precio = Number(price)
-        if(isNaN(precio)) {
-          {return res.status(400).json({ 
-              error: 'El campo PRECIO debe ser numérico' 
-            })
-          }
-          }else{
-            if(precio<0) {
-              {return res.status(400).json({ 
-                  error: 'El campo PRECIO debe ser mayor o igual a 0' 
-                })
-              }
-            }
-          }
-          price = precio
-          let disponible = Number(stock);
-          if(isNaN(disponible)) {
-          {return res.status(400).json({ 
-              error: 'El campo STOCK debe ser numérico' 
-            })
-          } 
-          }else{
-            if(disponible<0) {
-              {return res.status(400).json({ 
-                  error: 'El campo STOCK debe ser mayor o igual a 0' 
-                })
-              }
-            }
-          }
-        stock = disponible 
-        if (!categoriasValidas.includes(category)) {
-          res.setHeader("Content-Type", "applcation/json");
-          return res.status(400).json({ 
-            error: `Las categorias válidas son: "Tintos", "Blancos", "Rosados" o "Espumantes"` 
-          });
-        }
-        status = true
-        thumbnails = []
-        let existe
-        try {
-          existe = await productsMongoDAO.getProductBy({code});
-        } catch (error) {
-            res.setHeader("Content-Type", "applcation/json");
-          return res.status(500).json({
-            error: `Error inesperado en el servidor, Intente mas tarde`,
-            detalle: `${error.mensaje}`,
-          });
-        }
-        if (!existe) {
-          try {
-              let newProd= await productsMongoDAO.addproduct({code, category, title, description, price, stock, status, thumbnails, ...otros});
-              io.emit('agregarProducto', newProd);
-              res.setHeader("Content-Type", "applcation/json");
-              return res.status(200).json({ newProd });
-          } catch (error) {
-              res.setHeader("Content-Type", "applcation/json");
-              res.status(500).json({ error: `Error ${error.mensaje} al agregar producto ${productoNuevo}` });
-          }
-        } else {
-          res.setHeader("Content-Type", "applcation/json");
-          return res
-            .status(400)
-            .json({ error: `Ya existe un producto de nombre ${code}`});
-        }
-      };
-      
-      static updateProduct = async (req, res) => {
+    static getProductsById = async (req, res) => {
         let { id } = req.params;
-        let producto
+        if (!isValidObjectId(id)) {
+            return res.status(400).json({ error: "ID con formato inválido" });
+        }
         try {
-            producto = await productsMongoDAO.getProductById(id);
-          } catch (error) {
-            res.setHeader("Content-Type", "application/json");
-          return res.status(500).json({
-            error: `Error inesperado en el servidor. Intente más tarde`,
-            detalle: `${error.message}`,
-          });
-        }
-        if (!producto) {
-          res.setHeader("Content-Type", "application/json");
-          return res.status(400).json({ error: `No existe product con id: ${id}` });
-        }
-        let aModificar = req.body;
-        if (aModificar.price) {
-          let precio = Number(aModificar.price);
-          if(isNaN(precio)) {
-            {return res.status(400).json({ 
-                error: 'El campo PRECIO debe ser numérico' 
-              })
-            } 
-            }else{
-              if(precio<0) {
-                {return res.status(400).json({ 
-                    error: 'El campo PRECIO debe ser mayor o igual a 0' 
-                  })
-                }
-              }
+            let product = await productsMongoDAO.getProductById(id);
+            if (!product) {
+                return res.status(400).json({ error: `No existe un producto con ID ${id}` });
+            } else {
+                return res.status(200).json({ product });
             }
-          aModificar.price=precio
+        } catch (error) {
+            return res.status(500).json({
+                error: "Error inesperado en el servidor. Intente más tarde.",
+                detalle: error.message,
+            });
         }
-        if(aModificar.stock) {
-          let disponible = Number(aModificar.stock);
-          if(isNaN(disponible)) {
-            {return res.status(400).json({ 
-                error: 'El campo STOCK debe ser numérico' 
-              })
-            }
-            }else{
-              if(disponible<0) {
-                {return res.status(400).json({ 
-                    error: 'El campo STOCK debe ser mayor o igual a 0' 
-                  })
-                }
-              }
-            };
-            aModificar.stock=disponible
-          }
-          if(aModificar.category) {
-          if (!categoriasValidas.includes(aModificar.category)) {
-              res.setHeader("Content-Type", "applcation/json");
-              return res.status(400).json({ 
-                error: `Las categorias válidas son: "Tintos", "Blancos", "Rosados" o "Espumantes"` 
-              });
-            }
-          }
-          if (aModificar.code) {
-            let existe = productsMongoDAO.getProductByCode(aModificar.code)
+    };
+
+    static createProduct = async (req, res) => {
+        let { code, category, title, description, price, stock, status, thumbnails, ...otros } = req.body;
+
+        if (!title || !description || !code || !price || !stock || !category) {
+            return res.status(400).json({
+                error: "Es obligatorio completar los campos title, description, code, price, stock y category",
+            });
+        }
+
+        price = Number(price);
+        if (isNaN(price) || price < 0) {
+            return res.status(400).json({ error: "El campo PRICE debe ser un número mayor o igual a 0" });
+        }
+
+        stock = Number(stock);
+        if (isNaN(stock) || stock < 0) {
+            return res.status(400).json({ error: "El campo STOCK debe ser un número mayor o igual a 0" });
+        }
+
+        if (!categoriasValidas.includes(category)) {
+            return res.status(400).json({
+                error: `Las categorías válidas son: "Tintos", "Blancos", "Rosados" o "Espumantes"`,
+            });
+        }
+
+        status = true;
+        thumbnails = [];
+
+        try {
+            const existe = await productsMongoDAO.getProductBy({ code });
             if (existe) {
-              res.setHeader("Content-Type", "application/json");
-              return res
-                .status(400)
-                .json({ error: `Ya existe otro product llamado ${aModificar.code}` });
+                return res.status(400).json({ error: `Ya existe un producto con el código ${code}` });
             }
-        }
-        let productModificado
-        try {
-          productModificado = await productsMongoDAO.updateproduct(id, aModificar);
-          res.setHeader("Content-Type", "application/json");
-          return res.status(200).json({ productModificado });
+
+            const newProd = await productsMongoDAO.addproduct({
+                code,
+                category,
+                title,
+                description,
+                price,
+                stock,
+                status,
+                thumbnails,
+                ...otros,
+            });
+
+            return res.status(201).json({ newProd });
         } catch (error) {
-          res.setHeader("Content-Type", "application/json");
-          return res.status(500).json({
-            error: `Error inesperado en el servidor al actualizar producto. Intente más tarde`,
-            detalle: `${error.message}`,
-          });
+            return res.status(500).json({
+                error: "Error inesperado al agregar el producto. Intente más tarde.",
+                detalle: error.message,
+            });
         }
-      };
-      
-      static deleteProduct = async (req, res) => {
-        let {id}= req.params
-        if(!isValidObjectId(id)){
-          res.setHeader('Content-Type','application/json');
-          return res.status(400).json({error:`id invalido ${id}`})
+    };
+
+    static updateProduct = async (req, res) => {
+        let { id } = req.params;
+
+        if (!isValidObjectId(id)) {
+            return res.status(400).json({ error: "ID con formato inválido" });
         }
-        let productoExiste = await productsMongoDAO.getProductById(id)
-        if(!productoExiste){
-            res.setHeader('Content-Type','application/json');
-            return res.status(400).json({error:`No existe el producto con id: ${id}`})
-        }
+
         try {
-            let productoEliminado=await productsMongoDAO.deleteproduct(id)
-            if(!productoEliminado){
-                res.setHeader('Content-Type','application/json');
-                return res.status(400).json({error:`No se ha podido eliminar el producto`})
+            const producto = await productsMongoDAO.getProductById(id);
+            if (!producto) {
+                return res.status(400).json({ error: `No existe producto con ID: ${id}` });
             }
-            res.setHeader('Content-Type','application/json');
-            return res.status(200).json({productoEliminado});
-        } catch (error) {
-            console.log(error);
-            res.setHeader('Content-Type','application/json');
-            return res.status(500).json(
-                { error:`Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`,
-                  detalle:`${error.message}`
+
+            let aModificar = req.body;
+            if (aModificar.price) {
+                aModificar.price = Number(aModificar.price);
+                if (isNaN(aModificar.price) || aModificar.price < 0) {
+                    return res.status(400).json({ error: "El campo PRICE debe ser un número mayor o igual a 0" });
                 }
-            )
+            }
+
+            if (aModificar.stock) {
+                aModificar.stock = Number(aModificar.stock);
+                if (isNaN(aModificar.stock) || aModificar.stock < 0) {
+                    return res.status(400).json({ error: "El campo STOCK debe ser un número mayor o igual a 0" });
+                }
+            }
+
+            if (aModificar.category && !categoriasValidas.includes(aModificar.category)) {
+                return res.status(400).json({
+                    error: `Las categorías válidas son: "Tintos", "Blancos", "Rosados" o "Espumantes"`,
+                });
+            }
+
+            const productModificado = await productsMongoDAO.updateproduct(id, aModificar);
+
+            return res.status(200).json({ productModificado });
+        } catch (error) {
+            return res.status(500).json({
+                error: "Error inesperado al actualizar producto. Intente más tarde.",
+                detalle: error.message,
+            });
         }
-      };
+    };
+
+    static deleteProduct = async (req, res) => {
+        let { id } = req.params;
+
+        if (!isValidObjectId(id)) {
+            return res.status(400).json({ error: `ID inválido ${id}` });
+        }
+
+        try {
+            const productoExiste = await productsMongoDAO.getProductById(id);
+            if (!productoExiste) {
+                return res.status(400).json({ error: `No existe el producto con ID: ${id}` });
+            }
+
+            const productoEliminado = await productsMongoDAO.deleteproduct(id);
+
+            return res.status(200).json({ productoEliminado });
+        } catch (error) {
+            return res.status(500).json({
+                error: "Error inesperado al eliminar producto. Intente más tarde.",
+                detalle: error.message,
+            });
+        }
+    };
 }

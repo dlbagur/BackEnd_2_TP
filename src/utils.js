@@ -18,3 +18,7 @@ export const passportCall=estrategia=>function (req, res, next) {
         return next()
     })(req, res, next);
 }
+
+export const comparaPassword = (password, hash) => {
+    return bcrypt.compareSync(password, hash);
+};

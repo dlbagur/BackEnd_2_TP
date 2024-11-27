@@ -11,4 +11,8 @@ export class usuariosMongoDAO{
         return await usuariosModel.findOne(filtro).lean()
     }
 
+    static async get(){
+        return await usuariosModel.find().lean()
+    }
+
 }

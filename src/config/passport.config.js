@@ -35,7 +35,7 @@ export const initPassport = () => {
 
                     // if (!first_name || !last_name || !age || !role) {
                     if (!first_name || !email || !role) {
-                            return done(null, false, { message: "Los campos first_name, email role y password son obligatorios" });
+                            return done(null, false, { message: "Los campos first_name, email, role y password son obligatorios" });
                     }
                     // if (isNaN(age) || age < 18) {
                     //     return done(null, false, { message: "Debes ser mayor de edad para registrarte" });

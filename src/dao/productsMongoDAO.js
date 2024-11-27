@@ -2,8 +2,9 @@ import { productosModelo } from "./models/productsModel.js";
 
 class ProductsMongoDAO {
 
-    static async getproducts() {
-          return await productosModelo.find().lean()
+    static async getProducts() {
+        //   return await productosModelo.find().lean()
+          return await productosModelo.find({}, "-description -thumbnails").lean();
     }
 
     static async getproductsPaginate(skip, limit, page, sortOptions = {}, filters = {}) {
@@ -38,10 +39,19 @@ class ProductsMongoDAO {
         return nuevoProducto; 
     }
 
-    static async updateproduct(id, aModificar = {}) {
-        return await productosModelo.updateOne({ _id: id }, aModificar);
+    static async updateproduct(id, updates) {
+        try {
+            const product = await productosModelo.findByIdAndUpdate(
+                id, 
+                updates, 
+                { new: true }
+            ).select('-description -thumbnails');
+            return product;
+        } catch (error) {
+            throw new Error(`Error al actualizar el producto: ${error.message}`);
+        }
     }
-
+    
     static async deleteproduct(id) {
         return await productosModelo.findByIdAndDelete(id, {new:true}).lean()
     }

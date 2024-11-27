@@ -9,7 +9,7 @@ router.get('/', async (req, res) => {
       res.setHeader('Content-Type','application/json');
       return res.status(400).json({error:`Complete nombre y contraseña`})      
    }
-   let usuario=usuarios.find(u=>u.first_name===first_name && u.password===password)
+   let usuario=usuario.find(u=>u.first_name===first_name && u.password===password)
    if (!usuario){
       res.setHeader('Content-Type','application/json');
       return res.status(401).json({error:`Credenciales inválidas`})

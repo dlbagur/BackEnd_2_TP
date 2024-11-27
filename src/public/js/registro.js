@@ -30,7 +30,7 @@ btnSubmit.addEventListener("click", async (e)=>{
     let body= {first_name, last_name, email, password, age, role}
 
     try {
-        let respuesta = await fetch("/api/sessions/registro", {
+        let respuesta = await fetch("/api/users/registro", {
             method: "post",
             headers: {
                 "Content-Type": "application/json"
