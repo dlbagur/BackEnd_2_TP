@@ -51,7 +51,7 @@ class CartsService {
 
         const { compra, sinStock } = await this.cartsDAO.purchase(cartId);
         if (compra.length === 0) {
-            throw new Error("No se pudo procesar la compra: todos los productos están fuera de stock");
+            throw new Error("No se pudo procesar la compra: no hay productos disponibles en el carrito");
         }
 
         return { compra, sinStock };
