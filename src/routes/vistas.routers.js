@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import ProductsManager from '../DAO/productsMongoDAO.js';
-import CartsManager from '../DAO/cartsMongoDAO.js';
+import ProductsDAO from '../DAO/productsMongoDAO.js';
+import CartsDAO from '../DAO/cartsMongoDAO.js';
 import { isValidObjectId } from "mongoose";
 import { auth } from '../middleware/auth.js';
 
@@ -64,7 +64,7 @@ router.get('/realtimeproducts', async (req, res) => {
     }
 
     try {
-        const products = await ProductsManager.getproductsPaginate(skip, limit, page, sortOptions, filters);
+        const products = await ProductsDAO.getproductsPaginate(skip, limit, page, sortOptions, filters);
         res.render('realTimeProducts', {
             products: products.docs,
             page: products.page,
@@ -85,7 +85,7 @@ router.get('/realtimeproducts', async (req, res) => {
 
 router.get('/realtimecarts', async (req, res) => {
     try {
-        const carts = await CartsManager.getCarts();
+        const carts = await CartsDAO.getCarts();
         res.render('realTimeCarts', { carts });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -94,7 +94,7 @@ router.get('/realtimecarts', async (req, res) => {
 
 router.get('/realtimecarts/carts', async (req, res) => {
     try {
-        const carts = await CartsManager.getCarts();
+        const carts = await CartsDAO.getCarts();
         res.render('realTimeCarts', { carts });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -107,7 +107,7 @@ router.get('/realtimecarts/carts/:cid', async (req, res) => {
         return res.status(400).json({ error: `ID con formato inválido` });
     }
     try {
-        let cart = await CartsManager.getCartById(cid);
+        let cart = await CartsDAO.getCartById(cid);
         if (!cart) {
             return res.status(400).json({ error: `No existe el carrito con ID ${cid}` });
         } else {

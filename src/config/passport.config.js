@@ -6,7 +6,7 @@
 import passport from "passport";
 import passportJWT from "passport-jwt"
 import local from "passport-local"
-import { usuariosMongoDAO } from "../DAO/usuariosMongoDAO.js";
+import { usuariosMongoDAO as usuariosDAO} from "../DAO/usuariosMongoDAO.js";
 import github from "passport-github2"
 import { generaHash, validaHash } from "../utils.js";
 import { config } from "./config.js";
@@ -41,7 +41,7 @@ export const initPassport = () => {
                     //     return done(null, false, { message: "Debes ser mayor de edad para registrarte" });
                     // }
 
-                    let existe = await usuariosMongoDAO.getUserBy({ email:username});
+                    let existe = await usuariosDAO.getUserBy({ email:username});
                     if (existe) {
                         return done(null, false, { message: "El email ya está registrado" });
                     }
@@ -55,7 +55,7 @@ export const initPassport = () => {
 
                     const passwordHash = generaHash(password);
 
-                    const nuevoUsuario = await usuariosMongoDAO.createUser({
+                    const nuevoUsuario = await usuariosDAO.createUser({
                         first_name,
                         last_name,
                         email: username,
@@ -80,7 +80,7 @@ export const initPassport = () => {
             },
             async(username, password, done)=>{
                 try {
-                    let usuario = await usuariosMongoDAO.getUserBy({email:username})
+                    let usuario = await usuariosDAO.getUserBy({email:username})
                     if(!usuario){
                         return done(null, false, { message: "Debe ingresar los datos de acceso" });
                     }

@@ -5,7 +5,7 @@ import { Server } from 'socket.io';
 import { config } from "./config/config.js";
 import { connDB } from './ConnDB.js';
 import productsRouter from './routes/products.router.js';
-import productsManager from "./DAO/productsMongoDAO.js"
+import productsDAO from "./DAO/productsMongoDAO.js"
 import cartsRouter from './routes/carts.router.js';
 import CartsManager from './DAO/cartsMongoDAO.js';
 import { router as vistasRouter } from './routes/vistas.routers.js';
@@ -58,7 +58,7 @@ io.on('connection', (socket) => {
 
     socket.on('validarProducto', async (code) => {
         try {
-            const existe = await productsManager.getProductBy({ code });
+            const existe = await productsDAO.getProductBy({ code });
             socket.emit('productoExiste', !!existe);
         } catch (error) {
             console.error('Error al validar el producto:', error);
@@ -68,7 +68,7 @@ io.on('connection', (socket) => {
 
     socket.on('validarProductoP', async (code) => {
         try {
-            const existe = await productsManager.getProductBy({ code });
+            const existe = await productsDAO.getProductBy({ code });
             socket.emit('productoExisteP', !!existe);
         } catch (error) {
             console.error('Error al validar el producto:', error);
@@ -78,7 +78,7 @@ io.on('connection', (socket) => {
 
     socket.on('crearProducto', async (producto) => {
         try {
-            const nuevoProducto = await productsManager.addproduct(producto);            
+            const nuevoProducto = await productsDAO.addproduct(producto);            
             io.emit('agregarProducto', nuevoProducto);
         } catch (error) {
             console.log("Error ", error)
@@ -90,7 +90,7 @@ io.on('connection', (socket) => {
         try {
             console.log("Modificar Producto: ", producto)
             const { _id, ...dataToUpdate } = producto;
-            const aModificarProducto = await productsManager.updateproduct(_id, dataToUpdate);
+            const aModificarProducto = await productsDAO.updateproduct(_id, dataToUpdate);
             io.emit('productoModificado', producto);
         } catch (error) {
             console.log("Error ", error)
@@ -100,7 +100,7 @@ io.on('connection', (socket) => {
 
     socket.on('eliminarProducto', async (idProducto) => {
         try {
-            await productsManager.deleteproduct(idProducto);
+            await productsDAO.deleteproduct(idProducto);
             io.emit('eliminarProducto', idProducto);
         } catch (error) {
             socket.emit('error', 'Error al eliminar producto');
@@ -109,7 +109,7 @@ io.on('connection', (socket) => {
 
     socket.on('crearProductoP', async (producto) => {
         try {
-            const nuevoProducto = await productsManager.addproduct(producto);            
+            const nuevoProducto = await productsDAO.addproduct(producto);            
             io.emit('agregarProductoP', nuevoProducto);
         } catch (error) {
             console.log("Error ", error)
@@ -120,7 +120,7 @@ io.on('connection', (socket) => {
     socket.on('modificarProductoP', async (producto) => {
         try {
             const { _id, ...dataToUpdate } = producto;
-            const aModificarProducto = await productsManager.updateproduct(_id, dataToUpdate);
+            const aModificarProducto = await productsDAO.updateproduct(_id, dataToUpdate);
             socket.emit('modificarProductoPag', producto);
         } catch (error) {
             console.log("Error ", error)
@@ -131,7 +131,7 @@ io.on('connection', (socket) => {
     
     socket.on('eliminarProductoP', async (idProducto) => {
         try {
-            await productsManager.deleteproduct(idProducto);
+            await productsDAO.deleteproduct(idProducto);
             io.emit('eliminarProductoP', idProducto);
         } catch (error) {
             socket.emit('error', 'Error al eliminar producto');
@@ -170,7 +170,7 @@ io.on('connection', (socket) => {
     socket.on('realTimeProductsRequest', async (data) => {
         try {
             const { skip = 0, limit = 10 } = data;
-            const productosPaginados = await productsManager.getproductsPaginate(skip, limit);
+            const productosPaginados = await productsDAO.getproductsPaginate(skip, limit);
             socket.emit('realTimeProductsResponse', productosPaginados);
         } catch (error) {
             socket.emit('error', 'Error al paginar Producto');
@@ -180,7 +180,7 @@ io.on('connection', (socket) => {
     socket.on('productsPaginatedRequest', async (data) => {
         try {
             const { skip = 0, limit = 10 } = data;
-            const productosPaginados = await productsManager.getproductsPaginate(skip, limit);
+            const productosPaginados = await productsDAO.getproductsPaginate(skip, limit);
             socket.emit('productsPaginatedResponse', productosPaginados);
         } catch (error) {
             socket.emit('error', 'Error al paginar Producto');
